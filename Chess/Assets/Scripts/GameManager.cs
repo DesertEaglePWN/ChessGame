@@ -28,14 +28,12 @@ public enum GameState {Wait, Select, Action};
 
 public class GameManager : MonoBehaviour
 {
-    public GameMode gameMode = GameMode.Classic;
-    public GameState gameState = GameState.Select;
-    private Board board;
+    private GameMode currentGameMode = GameMode.Classic;
+    private GameState currentGameState = GameState.Select;
     public ChessPiece activePiece;
     public TeamColor turnTeamColor = TeamColor.Black;
-
     public Board Board {get; private set;}
-
+  
     void Awake()
     {
 
@@ -43,7 +41,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        board = new Board(GameObject.FindObjectsOfType<BoardSpace>()); //Create the Board
+        Board = new Board(GameObject.FindObjectsOfType<BoardSpace>()); //Create the Board
     }
 
     // Update is called once per frame
@@ -52,26 +50,26 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void goToState(GameState stateToGo, TeamColor turnTeamColor) 
+    public void AdvanceGameState() 
     {
-        switch (stateToGo) 
+        switch (currentGameState) 
         { 
             case GameState.Wait:
-                gameState = GameState.Wait;
+                currentGameState = GameState.Wait;
                 break;
             case GameState.Select:
-                gameState = GameState.Select;
-                board.clearAvailableSpaces();
+                currentGameState = GameState.Action;
+                (activePiece.GetComponent("Halo") as Behaviour).enabled = true;
                 break;
             case GameState.Action:
-                gameState = GameState.Action;
-                (activePiece.GetComponent("Halo") as Behaviour).enabled = true;
+                currentGameState = GameState.Select;
+                Board.clearAvailableSpaces();
                 break;
         
         }
     }
 
-    public void changeTurn() {
+    public void ChangeTurn() {
         switch (turnTeamColor){
             case (TeamColor.Black):
                 turnTeamColor = TeamColor.White;
@@ -79,6 +77,70 @@ public class GameManager : MonoBehaviour
             case (TeamColor.White):
                 turnTeamColor = TeamColor.Black;
                 break;
+        }
+    }
+
+    public void PieceHover(ChessPiece piece) 
+    {
+        Behaviour halo = piece.GetComponent("Halo") as Behaviour;
+        halo.enabled = !halo.enabled;
+       
+    }
+
+    public void SelectPiece(ChessPiece piece)
+    {
+        Debug.Log(currentGameState);
+        
+        if (activePiece == piece)
+        {
+            Debug.Log("stuff");
+            DeselectPiece(piece);
+        }
+        else
+        {
+            BoardSpace[] availableSpaces = piece.GetAvailableSpaces();
+            DisplaySpaces(availableSpaces);
+            activePiece = piece;
+            Debug.Log(activePiece);
+            AdvanceGameState();
+        }
+        return;
+    }
+
+    public void DeselectPiece(ChessPiece piece)
+    {
+        BoardSpace[] availableSpaces = piece.GetAvailableSpaces();
+        HideSpaces(availableSpaces);
+        AdvanceGameState();
+        HideSpaces(availableSpaces);
+    }
+
+
+    public void DisplaySpaces(BoardSpace[] spacesToDisplay)
+    {
+        foreach (BoardSpace space in spacesToDisplay)
+        {
+            if (space != null)
+            {
+                space.spaceState = SpaceState.Open;
+                Renderer meshRenderer = space.GetComponent<Renderer>();
+                meshRenderer.enabled = true;
+            }
+        }
+
+    }
+
+    public void HideSpaces(BoardSpace[] spacesToHide)
+    {
+        foreach (BoardSpace space in spacesToHide)
+        {
+            if (space != null)
+            {
+                space.spaceState = SpaceState.Default;
+                Renderer meshRenderer = space.GetComponent<Renderer>();
+                meshRenderer.enabled = false;
+                AdvanceGameState();
+            }
         }
     }
 }

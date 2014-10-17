@@ -17,12 +17,11 @@ public class Pawn : ChessPiece{
     public override BoardSpace[] GetAvailableSpaces()
     {
         List<BoardSpace> possibleSpaces = new List<BoardSpace>();
-        Debug.Log(board.getAdjacentSpace(currentSpace, SpaceDirection.Front, teamColor));
-        possibleSpaces.Add(board.getAdjacentSpace(currentSpace, SpaceDirection.Front, teamColor));
+        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, teamColor));
         
         if (!bHasMoved)
         {
-            possibleSpaces.Add(board.getAdjacentSpace(possibleSpaces[0], SpaceDirection.Front, teamColor));
+            possibleSpaces.Add(gameManager.Board.getAdjacentSpace(possibleSpaces[0], SpaceDirection.Front, teamColor));
         }
         return possibleSpaces.ToArray();
     }

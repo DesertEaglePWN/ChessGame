@@ -18,7 +18,7 @@ public class Bishop : ChessPiece{
     {
         //Debug.Log (activeSpace.getSpace(SpaceDirection.Front,teamColor));
         List<BoardSpace> possibleSpaces = new List<BoardSpace>();
-        BoardSpace[] Diagonals = board.getDiagonals(currentSpace);
+        BoardSpace[] Diagonals = gameManager.Board.getDiagonals(currentSpace);
         foreach (BoardSpace space in Diagonals) {
             possibleSpaces.Add(space);
         }

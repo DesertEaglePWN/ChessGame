@@ -17,7 +17,7 @@ public class Queen : ChessPiece{
 	public override BoardSpace[] GetAvailableSpaces(){
 		//Debug.Log (activeSpace.getSpace(SpaceDirection.Front,teamColor));
         List<BoardSpace> possibleSpaces = new List<BoardSpace>();
-        possibleSpaces.Add(board.getAdjacentSpace(currentSpace, SpaceDirection.Front, teamColor));
+        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, teamColor));
 
         return possibleSpaces.ToArray();
 	}

@@ -18,14 +18,14 @@ public class King : ChessPiece{
     {
         //Debug.Log (activeSpace.getSpace(SpaceDirection.Front,teamColor));
         List<BoardSpace> possibleSpaces = new List<BoardSpace>();
-        possibleSpaces.Add(board.getAdjacentSpace(currentSpace, SpaceDirection.FrontLeft, teamColor));
-        possibleSpaces.Add(board.getAdjacentSpace(currentSpace, SpaceDirection.Front, teamColor));
-        possibleSpaces.Add(board.getAdjacentSpace(currentSpace, SpaceDirection.FrontRight, teamColor));
-        possibleSpaces.Add(board.getAdjacentSpace(currentSpace, SpaceDirection.Left, teamColor));
-        possibleSpaces.Add(board.getAdjacentSpace(currentSpace, SpaceDirection.Right, teamColor));
-        possibleSpaces.Add(board.getAdjacentSpace(currentSpace, SpaceDirection.BackLeft, teamColor));
-        possibleSpaces.Add(board.getAdjacentSpace(currentSpace, SpaceDirection.Back, teamColor));
-        possibleSpaces.Add(board.getAdjacentSpace(currentSpace, SpaceDirection.BackRight, teamColor));
+        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontLeft, teamColor));
+        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, teamColor));
+        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontRight, teamColor));
+        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.Left, teamColor));
+        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.Right, teamColor));
+        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.BackLeft, teamColor));
+        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.Back, teamColor));
+        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.BackRight, teamColor));
         return possibleSpaces.ToArray();
     }
 

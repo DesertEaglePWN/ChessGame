@@ -46,7 +46,6 @@ public abstract class ChessPiece : MonoBehaviour
     void Start()
     {
         //On Start, check and update piece color and position
-        board = gameManager.Board;
         if (teamColor == TeamColor.Black)
         {
             gameObject.renderer.material = materialLibrary.materialBlack;
@@ -70,79 +69,20 @@ public abstract class ChessPiece : MonoBehaviour
 
     void OnMouseEnter()
     {
-        if ((gameManager.gameState == GameState.Select) && (this.teamColor == gameManager.turnTeamColor))   //Check if piece can be selected
-        {
-            (gameObject.GetComponent("Halo") as Behaviour).enabled = true;  //Enable mouseover Halo effect
-        }
+        gameManager.PieceHover(this);
     }
 
     void OnMouseExit()
     {
-        (gameObject.GetComponent("Halo") as Behaviour).enabled = false;     //Disable mouseover Halo effect
+        gameManager.PieceHover(this);
     }
 
     void OnMouseDown()
     {
-        if ((gameManager.gameState == GameState.Select) && (this.teamColor == gameManager.turnTeamColor))   //Check if piece can be selected
-        {
-            SelectPiece();
-            BoardSpace[] availableSpaces = GetAvailableSpaces();    //Get all available spaces     
-            DisplaySpaces(availableSpaces);                         //Display returned spaces
-            gameManager.gameState = GameState.Action;               //Change the game state
-        }
-        else if (                                                   // Is this piece currently selected?
-                 (gameManager.gameState == GameState.Action)
-                 && (this.teamColor == gameManager.turnTeamColor) 
-                 && (this == gameManager.activePiece)
-                ) 
-        {
-            DeselectPiece(); 
-        }
-    }
-
-    public void SelectPiece()
-    {
-        availableSpaces = GetAvailableSpaces();
-        DisplaySpaces(availableSpaces);
-        gameManager.activePiece = this;
-        gameManager.gameState = GameState.Action;
-    }
-
-    public void DeselectPiece()
-    {
-        availableSpaces = GetAvailableSpaces();
-        HideSpaces(availableSpaces);
-        gameManager.gameState = GameState.Select;
-        HideSpaces(availableSpaces);
+        gameManager.SelectPiece(this);
     }
 
     public abstract BoardSpace[] GetAvailableSpaces();
-
-    public void DisplaySpaces(BoardSpace[] spacesToDisplay){
-        foreach (BoardSpace space in spacesToDisplay)
-        {
-          if (space != null){
-            space.spaceState = SpaceState.Open;
-            Renderer meshRenderer = space.GetComponent<Renderer>();
-            meshRenderer.enabled = true;
-            gameManager.gameState = GameState.Action;
-          }
-        }
-
-    }
-
-    public void HideSpaces(BoardSpace[] spacesToHide){
-        foreach (BoardSpace space in spacesToHide)
-        {
-            if (space != null)
-            {
-                space.spaceState = SpaceState.Default;
-                Renderer meshRenderer = space.GetComponent<Renderer>();
-                meshRenderer.enabled = false;
-                gameManager.gameState = GameState.Select;
-            }
-        }
-    }
 
     public void Move(BoardSpace targetSpace)
     {
@@ -151,6 +91,6 @@ public abstract class ChessPiece : MonoBehaviour
         gameObject.transform.position = Position;
         currentSpace = targetSpace;
         bHasMoved = true;
-        gameManager.changeTurn();
+        gameManager.ChangeTurn();
     }
 }

@@ -18,8 +18,8 @@ public class Rook : ChessPiece{
     {
         //Debug.Log (activeSpace.getSpace(SpaceDirection.Front,teamColor));
         List<BoardSpace> possibleSpaces = new List<BoardSpace>();
-        BoardSpace[] currentColumn = board.getCurrentColumn(currentSpace);
-        BoardSpace[] currentRow = board.getCurrentRow(currentSpace);
+        BoardSpace[] currentColumn = gameManager.Board.getCurrentColumn(currentSpace);
+        BoardSpace[] currentRow = gameManager.Board.getCurrentRow(currentSpace);
         foreach (BoardSpace space in currentColumn) {
             possibleSpaces.Add(space);
         }

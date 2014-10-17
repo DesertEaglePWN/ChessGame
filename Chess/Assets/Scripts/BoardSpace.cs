@@ -63,7 +63,7 @@ public class BoardSpace : MonoBehaviour {
 	void OnMouseDown(){
         if (((spaceState == SpaceState.Open) || (spaceState == SpaceState.Contested))){
             gameManager.activePiece.Move(this);
-            gameManager.goToState(GameState.Select, gameManager.activePiece.teamColor);
+            gameManager.AdvanceGameState();
         }
 					
 		
