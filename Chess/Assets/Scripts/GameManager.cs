@@ -33,7 +33,11 @@ public class GameManager : MonoBehaviour
     public ChessPiece activePiece;
     public TeamColor turnTeamColor = TeamColor.Black;
     public Board Board {get; private set;}
-  
+    /// <summary>
+    /// A Vector3 used for position calculations.
+    /// </summary>
+    protected Vector3 Position;
+
     void Awake()
     {
 
@@ -82,39 +86,75 @@ public class GameManager : MonoBehaviour
 
     public void PieceHover(ChessPiece piece) 
     {
-        Behaviour halo = piece.GetComponent("Halo") as Behaviour;
-        halo.enabled = !halo.enabled;
-       
+        if (turnTeamColor == piece.PieceColor)
+        {
+            Behaviour halo = piece.GetComponent("Halo") as Behaviour;
+            halo.enabled = !halo.enabled;
+        }
     }
 
     public void SelectPiece(ChessPiece piece)
     {
-        Debug.Log(currentGameState);
-        
-        if (activePiece == piece)
+        if (turnTeamColor == piece.PieceColor)
         {
-            Debug.Log("stuff");
-            DeselectPiece(piece);
-        }
-        else
-        {
-            BoardSpace[] availableSpaces = piece.GetAvailableSpaces();
-            DisplaySpaces(availableSpaces);
-            activePiece = piece;
-            Debug.Log(activePiece);
-            AdvanceGameState();
+            if (activePiece == piece)
+            {
+                Debug.Log("stuff");
+                DeselectPiece(piece);
+            }
+            else
+            {
+                BoardSpace[] availableSpaces = piece.GetAvailableSpaces();
+                DisplaySpaces(availableSpaces);
+                activePiece = piece;
+                Debug.Log(activePiece);
+                AdvanceGameState();
+            }
         }
         return;
     }
 
     public void DeselectPiece(ChessPiece piece)
     {
-        BoardSpace[] availableSpaces = piece.GetAvailableSpaces();
-        HideSpaces(availableSpaces);
-        AdvanceGameState();
-        HideSpaces(availableSpaces);
+        if (turnTeamColor == piece.PieceColor)
+        {
+            BoardSpace[] availableSpaces = piece.GetAvailableSpaces();
+            HideSpaces(availableSpaces);
+            AdvanceGameState();
+            HideSpaces(availableSpaces);
+        }
+    }
+    /// <summary>
+    /// Moves the GameManager's activePiece to the destination BoardSpace.
+    /// </summary>
+    /// <param name="destination"></param>
+    public void MovePiece(BoardSpace destination) 
+    { 
+        Position.x = destination.transform.position.x;
+        Position.z = destination.transform.position.z;
+        Position.y = activePiece.transform.position.y;
+        activePiece.transform.position = Position;
+        activePiece.currentSpace = destination;
+        activePiece.bHasMoved = true;
+        ChangeTurn();
     }
 
+    /// <summary>
+    /// Moves a passed in ChessPiece to the destination BoardSpace
+    /// </summary>
+    /// <param name="pieceToMove"></param>
+    /// <param name="destination"></param>
+    public void MovePiece(ChessPiece pieceToMove, BoardSpace destination) 
+    {
+        Position.x = destination.transform.position.x;
+        Position.z = destination.transform.position.z;
+        Position.y = pieceToMove.transform.position.y;
+        pieceToMove.transform.position = Position;
+        pieceToMove.currentSpace = destination;
+        pieceToMove.bHasMoved = true;
+        ChangeTurn();
+    
+    }
 
     public void DisplaySpaces(BoardSpace[] spacesToDisplay)
     {

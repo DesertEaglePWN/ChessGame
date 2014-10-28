@@ -146,86 +146,198 @@ public class Board {
         }
 
 
-   
+    public bool testAdjacentSpace(ref BoardSpace currentSpace, SpaceDirection direction, TeamColor PieceColor)
+    {
+        int[] indexArray = getIndex(currentSpace);
+        switch (direction)
+        {				//Determine newSpaceRow and newSpaceColumn by checking arguments
+            case (SpaceDirection.FrontLeft):
+                if (PieceColor == TeamColor.Black)
+                {
+                    indexArray[0] += 1; //Column
+                    indexArray[1] -= 1; //Row
+                }
+                else if (PieceColor == TeamColor.White)
+                {
+                    indexArray[0] -= 1; //Column
+                    indexArray[1] += 1; //Row
+                }
+                break;
 
-	public BoardSpace getAdjacentSpace(BoardSpace currentSpace, SpaceDirection direction, TeamColor teamColor){
+            case (SpaceDirection.Front):
+                if (PieceColor == TeamColor.Black)
+                {
+                    indexArray[1] -= 1; //Row
+                }
+                else if (PieceColor == TeamColor.White)
+                {
+                    indexArray[1] += 1; //Row
+                }
+                break;
+
+            case (SpaceDirection.FrontRight):
+                if (PieceColor == TeamColor.Black)
+                {
+                    indexArray[0] -= 1; //Column
+                    indexArray[1] -= 1; //Row
+                }
+                else if (PieceColor == TeamColor.White)
+                {
+                    indexArray[0] += 1; //Column
+                    indexArray[1] += 1; //Row
+                }
+                break;
+
+            case (SpaceDirection.Left):
+                if (PieceColor == TeamColor.Black)
+                {
+                    indexArray[0] += 1; //Column
+                }
+                else if (PieceColor == TeamColor.White)
+                {
+                    indexArray[0] -= 1; //Column
+                }
+                break;
+
+            case (SpaceDirection.Right):
+                if (PieceColor == TeamColor.Black)
+                {
+                    indexArray[0] -= 1; //Column
+                }
+                else if (PieceColor == TeamColor.White)
+                {
+                    indexArray[0] += 1; //Column
+                }
+                break;
+
+            case (SpaceDirection.BackLeft):
+                if (PieceColor == TeamColor.Black)
+                {
+                    indexArray[0] += 1; //Column
+                    indexArray[1] += 1; //Row
+                }
+                else if (PieceColor == TeamColor.White)
+                {
+                    indexArray[0] -= 1; //Column
+                    indexArray[1] -= 1; //Row
+                }
+                break;
+
+            case (SpaceDirection.Back):
+                if (PieceColor == TeamColor.Black)
+                {
+                    indexArray[1] += 1; //Row
+                }
+                else if (PieceColor == TeamColor.White)
+                {
+                    indexArray[1] -= 1; //Row
+                }
+                break;
+
+            case (SpaceDirection.BackRight):
+                if (PieceColor == TeamColor.Black)
+                {
+                    indexArray[0] -= 1; //Column
+                    indexArray[1] += 1; //Row
+                }
+                else if (PieceColor == TeamColor.White)
+                {
+                    indexArray[0] += 1; //Column
+                    indexArray[1] -= 1; //Row
+                }
+                break;
+
+            default:
+                break;
+        }
+        if ((indexArray[0] < 0) || (indexArray[1] < 0) || (indexArray[0] > 7) || (indexArray[1] > 7))
+        {
+            currentSpace = null;
+            return false;
+        }
+        currentSpace = spaces[indexArray[0], indexArray[1]];
+
+        return currentSpace.OccupyingPiece == null;
+    }
+
+	public BoardSpace getAdjacentSpace(BoardSpace currentSpace, SpaceDirection direction, TeamColor PieceColor){
 	    int[] indexArray = getIndex (currentSpace);
 		switch (direction) {				//Determine newSpaceRow and newSpaceColumn by checking arguments
 			case (SpaceDirection.FrontLeft):
-				if (teamColor == TeamColor.Black){
+				if (PieceColor == TeamColor.Black){
 					indexArray[0] += 1; //Column
 					indexArray[1] -= 1; //Row
 				}
-				else if (teamColor == TeamColor.White){
+				else if (PieceColor == TeamColor.White){
 					indexArray[0] -= 1; //Column
 					indexArray[1] += 1; //Row
 				}
 				break;	
 
 			case (SpaceDirection.Front):
-				if (teamColor == TeamColor.Black){
+				if (PieceColor == TeamColor.Black){
 					indexArray[1] -= 1; //Row
 				}
-				else if (teamColor == TeamColor.White){
+				else if (PieceColor == TeamColor.White){
 					indexArray[1] += 1; //Row
 				}
 				break;	
 
 			case (SpaceDirection.FrontRight):
-				if (teamColor == TeamColor.Black){
+				if (PieceColor == TeamColor.Black){
 					indexArray[0] -= 1; //Column
 					indexArray[1] -= 1; //Row
 				}
-				else if (teamColor == TeamColor.White){
+				else if (PieceColor == TeamColor.White){
 					indexArray[0] += 1; //Column
 					indexArray[1] += 1; //Row
 				}
 				break;	
 
 			case (SpaceDirection.Left):
-				if (teamColor == TeamColor.Black){
+				if (PieceColor == TeamColor.Black){
 					indexArray[0] += 1; //Column
 				}
-				else if (teamColor == TeamColor.White){
+				else if (PieceColor == TeamColor.White){
 					indexArray[0] -= 1; //Column
 				}
 				break;	
 
 			case (SpaceDirection.Right):
-				if (teamColor == TeamColor.Black){
+				if (PieceColor == TeamColor.Black){
 					indexArray[0] -= 1; //Column
 				}
-				else if (teamColor == TeamColor.White){
+				else if (PieceColor == TeamColor.White){
 					indexArray[0] += 1; //Column
 				}
 				break;	
 
 			case (SpaceDirection.BackLeft):
-				if (teamColor == TeamColor.Black){
+				if (PieceColor == TeamColor.Black){
 					indexArray[0] += 1; //Column
 					indexArray[1] += 1; //Row
 				}
-				else if (teamColor == TeamColor.White){
+				else if (PieceColor == TeamColor.White){
 					indexArray[0] -= 1; //Column
 					indexArray[1] -= 1; //Row
 				}
 				break;	
 
 			case (SpaceDirection.Back):
-                if (teamColor == TeamColor.Black){
+                if (PieceColor == TeamColor.Black){
 					indexArray[1] += 1; //Row
 				}
-				else if (teamColor == TeamColor.White){
+				else if (PieceColor == TeamColor.White){
 					indexArray[1] -= 1; //Row
 				}
 				break;	
 
 			case (SpaceDirection.BackRight):
-				if (teamColor == TeamColor.Black){
+				if (PieceColor == TeamColor.Black){
 					indexArray[0] -= 1; //Column
 					indexArray[1] += 1; //Row
 				}
-				else if (teamColor == TeamColor.White){
+				else if (PieceColor == TeamColor.White){
 					indexArray[0] += 1; //Column
 					indexArray[1] -= 1; //Row
 				}

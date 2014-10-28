@@ -16,13 +16,39 @@ public class Bishop : ChessPiece{
 
     public override BoardSpace[] GetAvailableSpaces()
     {
-        //Debug.Log (activeSpace.getSpace(SpaceDirection.Front,teamColor));
+        List<BoardSpace> availableSpaces = new List<BoardSpace>();
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.FrontLeft));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.FrontRight));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.BackLeft));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.BackRight));
+
+        //foreach (SpaceDirection direction in Enum.GetValues(typeof(SpaceDirection)) { }
+
+        //Debug.Log (activeSpace.getSpace(SpaceDirection.Front,PieceColor));
+        /*
         List<BoardSpace> possibleSpaces = new List<BoardSpace>();
         BoardSpace[] Diagonals = gameManager.Board.getDiagonals(currentSpace);
         foreach (BoardSpace space in Diagonals) {
             possibleSpaces.Add(space);
         }
-        return possibleSpaces.ToArray();
+         */
+        return availableSpaces.ToArray();
+    }
+
+    private List<BoardSpace> GetAvailableInDirection(SpaceDirection direction)
+    {
+        List<BoardSpace> availableSpaces = new List<BoardSpace>();
+        BoardSpace checkSpace = currentSpace;
+        while (gameManager.Board.testAdjacentSpace(ref checkSpace, direction, PieceColor))
+        {
+            availableSpaces.Add(checkSpace);
+        }
+        ChessPiece blockingPiece = (availableSpaces.Count > 0) ? availableSpaces[availableSpaces.Count - 1].OccupyingPiece : null;
+        if (blockingPiece != null && blockingPiece.PieceColor == PieceColor)
+        {
+            availableSpaces.RemoveAt(availableSpaces.Count - 1);
+        }
+        return availableSpaces;
     }
 
 }

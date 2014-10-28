@@ -20,7 +20,10 @@ public class BoardSpace : MonoBehaviour {
 	//public char spaceColor;
 	public SpaceState spaceState = SpaceState.Default;
 
+    private ChessPiece occupyingPiece;
+    public ChessPiece OccupyingPiece { get; set; }
 
+    public bool bOccupied = false;
 
 	void Awake(){
 		//Initialize Board
@@ -30,9 +33,6 @@ public class BoardSpace : MonoBehaviour {
 		} else {
 				Debug.Log ("Non-BoardSpace object running BoardSpace.cs");
 		}
-		//Debug.Log (gameObject.name);
-		//Debug.Log (spaceColumn.ToString());
-		//Debug.Log (spaceRow.ToString());
 	}
 
 	void OnMouseEnter(){
@@ -62,7 +62,7 @@ public class BoardSpace : MonoBehaviour {
 
 	void OnMouseDown(){
         if (((spaceState == SpaceState.Open) || (spaceState == SpaceState.Contested))){
-            gameManager.activePiece.Move(this);
+            gameManager.MovePiece(this);
             gameManager.AdvanceGameState();
         }
 					

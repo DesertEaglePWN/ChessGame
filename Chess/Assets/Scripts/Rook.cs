@@ -16,7 +16,7 @@ public class Rook : ChessPiece{
 
     public override BoardSpace[] GetAvailableSpaces()
     {
-        //Debug.Log (activeSpace.getSpace(SpaceDirection.Front,teamColor));
+        //Debug.Log (activeSpace.getSpace(SpaceDirection.Front,));
         List<BoardSpace> possibleSpaces = new List<BoardSpace>();
         BoardSpace[] currentColumn = gameManager.Board.getCurrentColumn(currentSpace);
         BoardSpace[] currentRow = gameManager.Board.getCurrentRow(currentSpace);

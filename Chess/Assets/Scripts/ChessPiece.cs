@@ -23,10 +23,13 @@ public abstract class ChessPiece : MonoBehaviour
     public MaterialLibrary materialLibrary;
 
     /// <summary>
-    /// The piece's team color.  SET PRIVATE WHEN DONE.
+    /// The piece's team color.
     /// (Defaults to "None")
     /// </summary>
-    public TeamColor teamColor = TeamColor.None;
+    private TeamColor pieceColor = TeamColor.None;
+
+    public TeamColor PieceColor { get; private set; }
+
 
     /// <summary>
     /// The position of the piece.
@@ -36,7 +39,7 @@ public abstract class ChessPiece : MonoBehaviour
     public bool bHasMoved = false;
 
     /// <summary>
-    /// The current space that the piece resides on. SET PRIVATE WHEN DONE.
+    /// The current space that the piece resides on.
     /// </summary>
     public BoardSpace currentSpace;
 
@@ -45,19 +48,19 @@ public abstract class ChessPiece : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        //On Start, check and update piece color and position
-        if (teamColor == TeamColor.Black)
+        InitPieceColor();
+        if (PieceColor == TeamColor.Black)
         {
             gameObject.renderer.material = materialLibrary.materialBlack;
         }
-        else if (teamColor == TeamColor.White)
+        else if (PieceColor == TeamColor.White)
         {
             gameObject.renderer.material = materialLibrary.materialWhite;
         }
         Position.x = currentSpace.transform.position.x;
         Position.z = currentSpace.transform.position.z;
-        Position.y = gameObject.transform.position.y;
-        gameObject.transform.position = Position;
+        Position.y = this.transform.position.y;
+        this.transform.position = Position;
     }
 
     // Update is called once per frame
@@ -84,13 +87,21 @@ public abstract class ChessPiece : MonoBehaviour
 
     public abstract BoardSpace[] GetAvailableSpaces();
 
-    public void Move(BoardSpace targetSpace)
-    {
-        Position.x = targetSpace.transform.position.x;
-        Position.z = targetSpace.transform.position.z;
-        gameObject.transform.position = Position;
-        currentSpace = targetSpace;
-        bHasMoved = true;
-        gameManager.ChangeTurn();
-    }
+    private void InitPieceColor()
+        {
+            //On Start, check and update piece color and position
+            if ((currentSpace.spaceRow == '1') || (currentSpace.spaceRow == '2'))
+            {
+                PieceColor = TeamColor.White;
+            }
+            else if ((currentSpace.spaceRow == '7') || (currentSpace.spaceRow == '8'))
+            {
+                PieceColor = TeamColor.Black;
+            }
+            else
+            {
+                PieceColor = TeamColor.None;
+            }
+            return;
+        }
 }
