@@ -18,14 +18,14 @@ public class King : ChessPiece{
     {
         //Debug.Log (activeSpace.getSpace(SpaceDirection.Front,PieceColor));
         List<BoardSpace> possibleSpaces = new List<BoardSpace>();
-        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontLeft, PieceColor));
-        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, PieceColor));
-        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontRight, PieceColor));
-        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.Left, PieceColor));
-        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.Right, PieceColor));
-        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.BackLeft, PieceColor));
-        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.Back, PieceColor));
-        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.BackRight, PieceColor));
+        possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontLeft, PieceColor));
+        possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, PieceColor));
+        possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontRight, PieceColor));
+        possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Left, PieceColor));
+        possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Right, PieceColor));
+        possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.BackLeft, PieceColor));
+        possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Back, PieceColor));
+        possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.BackRight, PieceColor));
         return possibleSpaces.ToArray();
     }
 

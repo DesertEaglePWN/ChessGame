@@ -8,20 +8,20 @@ using UnityEngine;
 /// Enumeration of BoardSpace states
 /// (Default = 0, Active = 1, Contested = 2)
 /// </summary>
-public enum SpaceState {Default, Open, Contested};
+public enum SpaceState {Default, Open, Blocked, Contested};
 
 
 public class BoardSpace : MonoBehaviour {
 	public MaterialLibrary materialLibrary;
-	public GameManager gameManager;
 
 	public char spaceColumn;
 	public char spaceRow;
 	//public char spaceColor;
-	public SpaceState spaceState = SpaceState.Default;
+	public SpaceState spaceState = SpaceState.Open;
 
-    private ChessPiece occupyingPiece;
-    public ChessPiece OccupyingPiece { get; set; }
+   [SerializeField]
+   private ChessPiece occupyingPiece;
+   public ChessPiece OccupyingPiece { get { return occupyingPiece; } set { occupyingPiece = value; } }
 
     public bool bOccupied = false;
 
@@ -36,12 +36,13 @@ public class BoardSpace : MonoBehaviour {
 	}
 
 	void OnMouseEnter(){
+        Debug.Log(spaceState);
 		switch (spaceState) {
 			case(SpaceState.Open):
-				gameObject.renderer.material = materialLibrary.materialSpaceOpenHover;
+				this.renderer.material = materialLibrary.materialSpaceOpenHover;
 				break;
 			case(SpaceState.Contested):
-				gameObject.renderer.material = materialLibrary.materialSpaceContestedHover;
+				this.renderer.material = materialLibrary.materialSpaceContestedHover;
 				break;
 		}
 		return;
@@ -50,10 +51,10 @@ public class BoardSpace : MonoBehaviour {
 	void OnMouseExit(){
 		switch (spaceState) {
 			case(SpaceState.Open):
-				gameObject.renderer.material = materialLibrary.materialSpaceOpen;
+				this.renderer.material = materialLibrary.materialSpaceOpen;
 				break;
 			case(SpaceState.Contested):
-				gameObject.renderer.material = materialLibrary.materialSpaceContested;
+				this.renderer.material = materialLibrary.materialSpaceContested;
 				break;
 		}
 		
@@ -61,12 +62,19 @@ public class BoardSpace : MonoBehaviour {
 	}
 
 	void OnMouseDown(){
-        if (((spaceState == SpaceState.Open) || (spaceState == SpaceState.Contested))){
-            gameManager.MovePiece(this);
-            gameManager.AdvanceGameState();
+        if (spaceState == SpaceState.Open)
+        {
+            GameManager.currentInstance.MovePiece(this);
+            OccupyingPiece = GameManager.currentInstance.activePiece;
+            GameManager.currentInstance.AdvanceGameState();
         }
-					
-		
+        else if (spaceState == SpaceState.Contested)
+        {
+            GameManager.currentInstance.MovePiece(this);
+            GameManager.currentInstance.RemovePiece(this.OccupyingPiece);
+            OccupyingPiece = GameManager.currentInstance.activePiece;
+            GameManager.currentInstance.AdvanceGameState();
+        }
 		return;
 	}
 

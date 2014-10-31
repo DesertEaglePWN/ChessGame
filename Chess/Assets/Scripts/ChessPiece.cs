@@ -13,11 +13,6 @@ public abstract class ChessPiece : MonoBehaviour
 {
 
     /// <summary>
-    /// The Game Manager.
-    /// </summary>
-    public GameManager gameManager;
-
-    /// <summary>
     /// The Material Library.
     /// </summary>
     public MaterialLibrary materialLibrary;
@@ -72,17 +67,17 @@ public abstract class ChessPiece : MonoBehaviour
 
     void OnMouseEnter()
     {
-        gameManager.PieceHover(this);
+        GameManager.currentInstance.PieceHover(this);
     }
 
     void OnMouseExit()
     {
-        gameManager.PieceHover(this);
+        GameManager.currentInstance.PieceHover(this);
     }
 
     void OnMouseDown()
     {
-        gameManager.SelectPiece(this);
+        GameManager.currentInstance.SelectPiece(this);
     }
 
     public abstract BoardSpace[] GetAvailableSpaces();
@@ -104,4 +99,28 @@ public abstract class ChessPiece : MonoBehaviour
             }
             return;
         }
+
+    protected List<BoardSpace> GetAvailableInDirection(SpaceDirection direction)
+    {
+        List<BoardSpace> availableSpaces = new List<BoardSpace>();
+
+        BoardSpace checkSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, direction, PieceColor);
+
+        while (checkSpace != null && GameManager.currentInstance.Board.isSpaceAvailable(checkSpace, PieceColor))
+        {
+            availableSpaces.Add(checkSpace);
+            if (checkSpace.spaceState == SpaceState.Contested)
+            {
+                break;
+            }
+            checkSpace = GameManager.currentInstance.Board.getAdjacentSpace(checkSpace, direction, PieceColor);
+        }
+        //ChessPiece blockingPiece = (availableSpaces.Count > 0) ? availableSpaces[availableSpaces.Count - 1].OccupyingPiece : null;
+        //if (blockingPiece != null && blockingPiece.PieceColor == PieceColor)
+        //{
+        //    availableSpaces.RemoveAt(availableSpaces.Count - 1);
+        //}
+        return availableSpaces;
+    }
+
 }

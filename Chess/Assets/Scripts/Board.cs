@@ -49,92 +49,6 @@ public class Board {
 		};
 	}
 
-	public BoardSpace[] getCurrentRow(BoardSpace currentSpace){
-        int[] indexArray = getIndex(currentSpace);
-        int rowIndex = indexArray[1];
-        List<BoardSpace> currentRow = new List<BoardSpace>();
-        for(int i = 0; i <= 7; i++)
-        currentRow.Add(spaces[i,rowIndex]);
-		return currentRow.ToArray();
-	}
-
-	public BoardSpace[] getCurrentColumn(BoardSpace currentSpace){
-        int[] indexArray = getIndex(currentSpace);
-        int columnIndex = indexArray[0];
-        List<BoardSpace> currentColumn = new List<BoardSpace>();
-        for(int i =0; i <= 7; i++)
-        currentColumn.Add(spaces[columnIndex,i]);
-		return currentColumn.ToArray();
-	}
-
-	public BoardSpace[] getDiagonals(BoardSpace currentSpace){
-         List<BoardSpace> Diagonals = new List<BoardSpace>();
-
-         int[] indexArray = getIndex(currentSpace);
-         int[] currentIndex = getIndex(currentSpace);
-         indexArray.CopyTo(currentIndex,0);
-         while ((currentIndex[0] >= 0) && (currentIndex[1] >= 0) && (currentIndex[0] <= 7) && (currentIndex[1] <= 7))
-         {
-             Diagonals.Add(spaces[currentIndex[0], currentIndex[1]]);
-             currentIndex[0]++;
-             currentIndex[1]++;
-         }
-
-         indexArray.CopyTo(currentIndex, 0);
-         while ((currentIndex[0] >= 0) && (currentIndex[1] >= 0) && (currentIndex[0] <= 7) && (currentIndex[1] <= 7))
-         {
-             Diagonals.Add(spaces[currentIndex[0], currentIndex[1]]);
-             currentIndex[0]++;
-             currentIndex[1]--;         
-         }
-
-         indexArray.CopyTo(currentIndex, 0);
-         while ((currentIndex[0] >= 0) && (currentIndex[1] >= 0) && (currentIndex[0] <= 7) && (currentIndex[1] <= 7))
-         {
-             Diagonals.Add(spaces[currentIndex[0], currentIndex[1]]);
-             currentIndex[0]--;
-             currentIndex[1]++;
-         }
-
-         indexArray.CopyTo(currentIndex, 0);
-         while ((currentIndex[0] >= 0) && (currentIndex[1] >= 0) && (currentIndex[0] <= 7) && (currentIndex[1] <= 7))
-         {
-             Diagonals.Add(spaces[currentIndex[0], currentIndex[1]]);
-             currentIndex[0]--;
-             currentIndex[1]--;
-         }
-
-		return Diagonals.ToArray();
-	}
-
-    public BoardSpace[] getKnightLs(BoardSpace currentSpace){
-        List<BoardSpace> KnightL = new List<BoardSpace>();
-        int[] indexArray = getIndex(currentSpace);
-        int[] currentIndex = getIndex(currentSpace);
-       
-        for (int i = 0; i < 4; i++) { 
-            switch (i){
-                case 0:     //columnIndex + 2
-                    for (int j = 0; j < 4;j++){
-                    
-                    }
-                    break;
-                case 1:     //columnIndex - 2
-                    break;
-                case 2:     //rowIndex - 2
-                    break;
-                case 3:     //rowIndex - 2
-                    break;
-                default:
-                    break;
-            }
-            KnightL.Add(verifySpace(currentIndex));
-        }
-        return KnightL.ToArray();
-    }
-
-
-
     private BoardSpace verifySpace(int[] indexArray){
             if ((indexArray[0] < 0) || (indexArray[1] < 0) || (indexArray[0] > 7) || (indexArray[1] > 7)) {
                 return null;
@@ -145,122 +59,33 @@ public class Board {
             }
         }
 
-
-    public bool testAdjacentSpace(ref BoardSpace currentSpace, SpaceDirection direction, TeamColor PieceColor)
+    /// <summary>
+    /// Returns true if the adjacent space in the specified direction of the current space for the specified team color.
+    /// </summary>
+    /// <param name="currentSpace"></param>
+    /// <param name="direction"></param>
+    /// <param name="PieceColor"></param>
+    /// <returns></returns>
+    public bool isSpaceAvailable(BoardSpace spaceToCheck, TeamColor pieceColor)
     {
-        int[] indexArray = getIndex(currentSpace);
-        switch (direction)
-        {				//Determine newSpaceRow and newSpaceColumn by checking arguments
-            case (SpaceDirection.FrontLeft):
-                if (PieceColor == TeamColor.Black)
-                {
-                    indexArray[0] += 1; //Column
-                    indexArray[1] -= 1; //Row
-                }
-                else if (PieceColor == TeamColor.White)
-                {
-                    indexArray[0] -= 1; //Column
-                    indexArray[1] += 1; //Row
-                }
-                break;
-
-            case (SpaceDirection.Front):
-                if (PieceColor == TeamColor.Black)
-                {
-                    indexArray[1] -= 1; //Row
-                }
-                else if (PieceColor == TeamColor.White)
-                {
-                    indexArray[1] += 1; //Row
-                }
-                break;
-
-            case (SpaceDirection.FrontRight):
-                if (PieceColor == TeamColor.Black)
-                {
-                    indexArray[0] -= 1; //Column
-                    indexArray[1] -= 1; //Row
-                }
-                else if (PieceColor == TeamColor.White)
-                {
-                    indexArray[0] += 1; //Column
-                    indexArray[1] += 1; //Row
-                }
-                break;
-
-            case (SpaceDirection.Left):
-                if (PieceColor == TeamColor.Black)
-                {
-                    indexArray[0] += 1; //Column
-                }
-                else if (PieceColor == TeamColor.White)
-                {
-                    indexArray[0] -= 1; //Column
-                }
-                break;
-
-            case (SpaceDirection.Right):
-                if (PieceColor == TeamColor.Black)
-                {
-                    indexArray[0] -= 1; //Column
-                }
-                else if (PieceColor == TeamColor.White)
-                {
-                    indexArray[0] += 1; //Column
-                }
-                break;
-
-            case (SpaceDirection.BackLeft):
-                if (PieceColor == TeamColor.Black)
-                {
-                    indexArray[0] += 1; //Column
-                    indexArray[1] += 1; //Row
-                }
-                else if (PieceColor == TeamColor.White)
-                {
-                    indexArray[0] -= 1; //Column
-                    indexArray[1] -= 1; //Row
-                }
-                break;
-
-            case (SpaceDirection.Back):
-                if (PieceColor == TeamColor.Black)
-                {
-                    indexArray[1] += 1; //Row
-                }
-                else if (PieceColor == TeamColor.White)
-                {
-                    indexArray[1] -= 1; //Row
-                }
-                break;
-
-            case (SpaceDirection.BackRight):
-                if (PieceColor == TeamColor.Black)
-                {
-                    indexArray[0] -= 1; //Column
-                    indexArray[1] += 1; //Row
-                }
-                else if (PieceColor == TeamColor.White)
-                {
-                    indexArray[0] += 1; //Column
-                    indexArray[1] -= 1; //Row
-                }
-                break;
-
-            default:
-                break;
-        }
-        if ((indexArray[0] < 0) || (indexArray[1] < 0) || (indexArray[0] > 7) || (indexArray[1] > 7))
+        int[] indexArray = getIndex(spaceToCheck);
+        if (spaceToCheck.OccupyingPiece != null)
         {
-            currentSpace = null;
-            return false;
+            if (spaceToCheck.OccupyingPiece.PieceColor == pieceColor)
+            {
+                return false;
+            }
+            else
+            {
+                spaceToCheck.spaceState = SpaceState.Contested;
+                return true;
+            }
         }
-        currentSpace = spaces[indexArray[0], indexArray[1]];
-
-        return currentSpace.OccupyingPiece == null;
+        return true;
     }
 
 	public BoardSpace getAdjacentSpace(BoardSpace currentSpace, SpaceDirection direction, TeamColor PieceColor){
+        Debug.Log(currentSpace == null);
 	    int[] indexArray = getIndex (currentSpace);
 		switch (direction) {				//Determine newSpaceRow and newSpaceColumn by checking arguments
 			case (SpaceDirection.FrontLeft):
@@ -349,14 +174,27 @@ public class Board {
         if ((indexArray[0] < 0) || (indexArray[1] < 0) || (indexArray[0] > 7) || (indexArray[1] > 7)) {
                return null;
         }
-		return spaces[indexArray[0],indexArray[1]];
+        BoardSpace newSpace = spaces[indexArray[0], indexArray[1]];
+        if ((newSpace.OccupyingPiece != null) && (newSpace.OccupyingPiece.PieceColor == PieceColor))
+        {
+             newSpace.spaceState = SpaceState.Blocked;
+             return null;
+        }
+        if ((newSpace.OccupyingPiece != null) && (newSpace.OccupyingPiece.PieceColor != PieceColor))
+        {
+            newSpace.spaceState = SpaceState.Contested;
+            return spaces[indexArray[0],indexArray[1]];
+        }
+            newSpace.spaceState = SpaceState.Open;
+            return spaces[indexArray[0],indexArray[1]];
 	}
 
-   public void clearAvailableSpaces() {
+    public void clearAvailableSpaces() {
         foreach (BoardSpace space in spaces) {
             space.renderer.enabled = false;
             space.spaceState = SpaceState.Default;
         }
         return;
     }
+
 }

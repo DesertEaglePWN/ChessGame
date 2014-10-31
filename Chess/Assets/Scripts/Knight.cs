@@ -17,7 +17,8 @@ public class Knight: ChessPiece{
     public override BoardSpace[] GetAvailableSpaces()
     {
         //Debug.Log (activeSpace.getSpace(SpaceDirection.Front,PieceColor))
-        return gameManager.Board.getKnightLs(currentSpace);
+        //return GameManager.currentInstance.Board.getKnightLs(currentSpace);
+        return null;
     }
 
 }

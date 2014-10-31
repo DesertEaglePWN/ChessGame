@@ -28,6 +28,8 @@ public enum GameState {Wait, Select, Action};
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager currentInstance;
+    public static MaterialLibrary materialLibrary;
     private GameMode currentGameMode = GameMode.Classic;
     private GameState currentGameState = GameState.Select;
     public ChessPiece activePiece;
@@ -40,18 +42,12 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-
+        currentInstance = this;
     }
 
     void Start()
     {
         Board = new Board(GameObject.FindObjectsOfType<BoardSpace>()); //Create the Board
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     public void AdvanceGameState() 
@@ -63,10 +59,10 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.Select:
                 currentGameState = GameState.Action;
-                (activePiece.GetComponent("Halo") as Behaviour).enabled = true;
                 break;
             case GameState.Action:
                 currentGameState = GameState.Select;
+                activePiece = null;
                 Board.clearAvailableSpaces();
                 break;
         
@@ -84,9 +80,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Toggles a piece's "Halo" effect
+    /// </summary>
+    /// <param name="piece"></param>
     public void PieceHover(ChessPiece piece) 
     {
-        if (turnTeamColor == piece.PieceColor)
+        if ((turnTeamColor == piece.PieceColor))
         {
             Behaviour halo = piece.GetComponent("Halo") as Behaviour;
             halo.enabled = !halo.enabled;
@@ -99,7 +99,6 @@ public class GameManager : MonoBehaviour
         {
             if (activePiece == piece)
             {
-                Debug.Log("stuff");
                 DeselectPiece(piece);
             }
             else
@@ -124,45 +123,44 @@ public class GameManager : MonoBehaviour
             HideSpaces(availableSpaces);
         }
     }
+
     /// <summary>
     /// Moves the GameManager's activePiece to the destination BoardSpace.
     /// </summary>
     /// <param name="destination"></param>
     public void MovePiece(BoardSpace destination) 
-    { 
-        Position.x = destination.transform.position.x;
-        Position.z = destination.transform.position.z;
-        Position.y = activePiece.transform.position.y;
-        activePiece.transform.position = Position;
-        activePiece.currentSpace = destination;
-        activePiece.bHasMoved = true;
-        ChangeTurn();
+    {
+        MovePiece(activePiece, destination);
     }
-
     /// <summary>
     /// Moves a passed in ChessPiece to the destination BoardSpace
     /// </summary>
     /// <param name="pieceToMove"></param>
     /// <param name="destination"></param>
-    public void MovePiece(ChessPiece pieceToMove, BoardSpace destination) 
+    public void MovePiece(ChessPiece piece, BoardSpace destination) 
     {
         Position.x = destination.transform.position.x;
         Position.z = destination.transform.position.z;
-        Position.y = pieceToMove.transform.position.y;
-        pieceToMove.transform.position = Position;
-        pieceToMove.currentSpace = destination;
-        pieceToMove.bHasMoved = true;
+        Position.y = piece.transform.position.y;
+        piece.transform.position = Position;
+        piece.currentSpace.OccupyingPiece = null;
+        piece.currentSpace = destination;
+        destination.OccupyingPiece = piece;
+        piece.bHasMoved = true;
         ChangeTurn();
     
     }
 
+    public void RemovePiece(ChessPiece piece) {
+        GameObject.Destroy(piece.gameObject);
+    
+    }
     public void DisplaySpaces(BoardSpace[] spacesToDisplay)
     {
         foreach (BoardSpace space in spacesToDisplay)
         {
             if (space != null)
-            {
-                space.spaceState = SpaceState.Open;
+            {   
                 Renderer meshRenderer = space.GetComponent<Renderer>();
                 meshRenderer.enabled = true;
             }
