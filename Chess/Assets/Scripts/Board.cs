@@ -85,7 +85,6 @@ public class Board {
     }
 
 	public BoardSpace getAdjacentSpace(BoardSpace currentSpace, SpaceDirection direction, TeamColor PieceColor){
-        Debug.Log(currentSpace == null);
 	    int[] indexArray = getIndex (currentSpace);
 		switch (direction) {				//Determine newSpaceRow and newSpaceColumn by checking arguments
 			case (SpaceDirection.FrontLeft):
@@ -175,19 +174,20 @@ public class Board {
                return null;
         }
         BoardSpace newSpace = spaces[indexArray[0], indexArray[1]];
-        if ((newSpace.OccupyingPiece != null) && (newSpace.OccupyingPiece.PieceColor == PieceColor))
-        {
-             newSpace.spaceState = SpaceState.Blocked;
-             return null;
-        }
-        if ((newSpace.OccupyingPiece != null) && (newSpace.OccupyingPiece.PieceColor != PieceColor))
-        {
-            newSpace.spaceState = SpaceState.Contested;
-            return spaces[indexArray[0],indexArray[1]];
-        }
-            newSpace.spaceState = SpaceState.Open;
-            return spaces[indexArray[0],indexArray[1]];
-	}
+  
+            if ((newSpace.OccupyingPiece != null) && (newSpace.OccupyingPiece.PieceColor == PieceColor))
+            {
+                 newSpace.spaceState = SpaceState.Blocked;
+                 return null;
+            }
+            if ((newSpace.OccupyingPiece != null) && (newSpace.OccupyingPiece.PieceColor != PieceColor))
+            {
+                newSpace.spaceState = SpaceState.Contested;
+                return spaces[indexArray[0],indexArray[1]];
+            }
+                newSpace.spaceState = SpaceState.Open;
+                return spaces[indexArray[0],indexArray[1]];
+            }
 
     public void clearAvailableSpaces() {
         foreach (BoardSpace space in spaces) {

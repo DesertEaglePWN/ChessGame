@@ -70,8 +70,14 @@ public class BoardSpace : MonoBehaviour {
         }
         else if (spaceState == SpaceState.Contested)
         {
+            if (this.OccupyingPiece != null) {  
+                GameManager.currentInstance.RemovePiece(this.OccupyingPiece);   //default capture case
+            }
+            else if (GameManager.currentInstance.EnPassantPossible) {
+                 BoardSpace enPassantSpace = GameManager.currentInstance.Board.getAdjacentSpace(this, SpaceDirection.Back, GameManager.currentInstance.activePiece.PieceColor);
+                 GameManager.currentInstance.RemovePiece(enPassantSpace.OccupyingPiece);
+            }
             GameManager.currentInstance.MovePiece(this);
-            GameManager.currentInstance.RemovePiece(this.OccupyingPiece);
             OccupyingPiece = GameManager.currentInstance.activePiece;
             GameManager.currentInstance.AdvanceGameState();
         }

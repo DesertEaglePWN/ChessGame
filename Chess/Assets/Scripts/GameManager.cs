@@ -32,6 +32,8 @@ public class GameManager : MonoBehaviour
     public static MaterialLibrary materialLibrary;
     private GameMode currentGameMode = GameMode.Classic;
     private GameState currentGameState = GameState.Select;
+    private bool enPassantPossible = false;
+    public bool EnPassantPossible { get; set; }
     public ChessPiece activePiece;
     public TeamColor turnTeamColor = TeamColor.Black;
     public Board Board {get; private set;}
@@ -106,7 +108,6 @@ public class GameManager : MonoBehaviour
                 BoardSpace[] availableSpaces = piece.GetAvailableSpaces();
                 DisplaySpaces(availableSpaces);
                 activePiece = piece;
-                Debug.Log(activePiece);
                 AdvanceGameState();
             }
         }
