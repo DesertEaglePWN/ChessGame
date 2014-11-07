@@ -25,7 +25,6 @@ public class Knight: ChessPiece{
         //MOVE FRONT LEFT / FRONT RIGHT
         IsLastSpace = false;
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, PieceColor);
-        Debug.Log(tempSpace);
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Front, PieceColor);
         IsLastSpace = true;
         possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Left, PieceColor));

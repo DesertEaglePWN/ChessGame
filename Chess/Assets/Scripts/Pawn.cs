@@ -31,20 +31,24 @@ public class Pawn : ChessPiece
 
         //GET BASE MOVE SPACES
         BoardSpace nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, PieceColor);
-        if ((nextSpace.spaceState != SpaceState.Blocked) && (nextSpace.spaceState != SpaceState.Contested))      //if next forward space is not blocked or contested...
+        if (nextSpace != null) 
         {
-            possibleSpaces.Add(nextSpace);
-        }
-
-        if (!bHasMoved)
-        {
-            EnPassantCheck(nextSpace);
-            nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(nextSpace, SpaceDirection.Front, PieceColor);    //get the next forward space
-            if ((nextSpace != null) && (nextSpace.spaceState != SpaceState.Blocked) && (nextSpace.spaceState != SpaceState.Contested))  //if next forward space is not blocked or contested...
+            if ((nextSpace.spaceState != SpaceState.Blocked) && (nextSpace.spaceState != SpaceState.Contested))      //if next forward space is not blocked or contested...
             {
-                possibleSpaces.Add(nextSpace); //add it to possibleSpaces
+                possibleSpaces.Add(nextSpace);
+            }
+
+            if (!bHasMoved)
+            {
+                EnPassantCheck(nextSpace);
+                nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(nextSpace, SpaceDirection.Front, PieceColor);    //get the next forward space
+                if ((nextSpace != null) && (nextSpace.spaceState != SpaceState.Blocked) && (nextSpace.spaceState != SpaceState.Contested))  //if next forward space is not blocked or contested...
+                {
+                    possibleSpaces.Add(nextSpace); //add it to possibleSpaces
+                }
             }
         }
+
 
         //GET BASE CAPTURE SPACES
         BoardSpace captureSpace;

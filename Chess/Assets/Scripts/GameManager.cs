@@ -37,6 +37,8 @@ public class GameManager : MonoBehaviour
     public ChessPiece activePiece;
     public TeamColor turnTeamColor = TeamColor.Black;
     public Board Board {get; private set;}
+
+
     /// <summary>
     /// A Vector3 used for position calculations.
     /// </summary>
@@ -105,9 +107,9 @@ public class GameManager : MonoBehaviour
             }
             else
             {
+                activePiece = piece;
                 BoardSpace[] availableSpaces = piece.GetAvailableSpaces();
                 DisplaySpaces(availableSpaces);
-                activePiece = piece;
                 AdvanceGameState();
             }
         }
