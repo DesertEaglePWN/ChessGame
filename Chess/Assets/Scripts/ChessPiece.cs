@@ -11,12 +11,6 @@ public enum TeamColor {None, Black, White};
 
 public abstract class ChessPiece : MonoBehaviour
 {
-
-    /// <summary>
-    /// The Material Library.
-    /// </summary>
-    public MaterialLibrary materialLibrary;
-
     /// <summary>
     /// The piece's team color.
     /// (Defaults to "None")
@@ -24,12 +18,6 @@ public abstract class ChessPiece : MonoBehaviour
     private TeamColor pieceColor = TeamColor.None;
 
     public TeamColor PieceColor { get; private set; }
-
-
-    /// <summary>
-    /// The position of the piece.
-    /// </summary>
-    protected Vector3 Position;
 
     public bool bHasMoved = false;
 
@@ -46,16 +34,13 @@ public abstract class ChessPiece : MonoBehaviour
         InitPieceColor();
         if (PieceColor == TeamColor.Black)
         {
-            gameObject.renderer.material = materialLibrary.materialBlack;
+            this.renderer.material = GameManager.currentInstance.materialLibrary.materialBlack;
         }
         else if (PieceColor == TeamColor.White)
         {
-            gameObject.renderer.material = materialLibrary.materialWhite;
+            this.renderer.material = GameManager.currentInstance.materialLibrary.materialWhite;
         }
-        Position.x = currentSpace.transform.position.x;
-        Position.z = currentSpace.transform.position.z;
-        Position.y = this.transform.position.y;
-        this.transform.position = Position;
+        this.transform.position = new Vector3(currentSpace.transform.position.x,this.transform.position.y,currentSpace.transform.position.z);
     }
 
     // Update is called once per frame
@@ -77,7 +62,18 @@ public abstract class ChessPiece : MonoBehaviour
 
     void OnMouseDown()
     {
-        GameManager.currentInstance.SelectPiece(this);
+        if (GameManager.currentInstance.turnTeamColor == PieceColor)
+        {
+            if ((GameManager.currentInstance.activePiece == this))
+            {
+                GameManager.currentInstance.DeselectPiece(this);
+            }
+            else 
+            {
+                GameManager.currentInstance.SelectPiece(this);
+            }
+            
+        }
     }
 
     public abstract BoardSpace[] GetAvailableSpaces();
@@ -104,22 +100,18 @@ public abstract class ChessPiece : MonoBehaviour
     {
         List<BoardSpace> availableSpaces = new List<BoardSpace>();
 
-        BoardSpace checkSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, direction, PieceColor);
+        BoardSpace nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, direction, PieceColor);
 
-        while (checkSpace != null && GameManager.currentInstance.Board.isSpaceAvailable(checkSpace, PieceColor))
+        while (nextSpace != null && GameManager.currentInstance.Board.isSpaceAvailable(nextSpace, PieceColor))
         {
-            availableSpaces.Add(checkSpace);
-            if (checkSpace.spaceState == SpaceState.Contested)
+            availableSpaces.Add(nextSpace);
+            if (nextSpace.spaceState == SpaceState.Contested)
             {
                 break;
             }
-            checkSpace = GameManager.currentInstance.Board.getAdjacentSpace(checkSpace, direction, PieceColor);
+            nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(nextSpace, direction, PieceColor);
         }
-        //ChessPiece blockingPiece = (availableSpaces.Count > 0) ? availableSpaces[availableSpaces.Count - 1].OccupyingPiece : null;
-        //if (blockingPiece != null && blockingPiece.PieceColor == PieceColor)
-        //{
-        //    availableSpaces.RemoveAt(availableSpaces.Count - 1);
-        //}
+
         return availableSpaces;
     }
 

@@ -17,10 +17,13 @@ public class Bishop : ChessPiece{
     public override BoardSpace[] GetAvailableSpaces()
     {
         List<BoardSpace> availableSpaces = new List<BoardSpace>();
+
+        //GET BASE MOVE AND CAPTURE SPACES
         availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.FrontLeft));
         availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.FrontRight));
         availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.BackLeft));
         availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.BackRight));
+        
         return availableSpaces.ToArray();
     }
 }

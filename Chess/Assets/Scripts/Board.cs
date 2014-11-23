@@ -73,6 +73,7 @@ public class Board {
         {
             if (spaceToCheck.OccupyingPiece.PieceColor == pieceColor)
             {
+                spaceToCheck.spaceState = SpaceState.Blocked;
                 return false;
             }
             else
@@ -81,24 +82,30 @@ public class Board {
                 return true;
             }
         }
+        else
+        {
+            spaceToCheck.spaceState = SpaceState.Open;
+        }
         return true;
     }
 
-    public BoardSpace getAdjacentSpace(BoardSpace currentSpace, SpaceDirection direction, TeamColor PieceColor)
+    public BoardSpace getAdjacentSpace(BoardSpace currentSpace, SpaceDirection direction, TeamColor pieceColor)
     {
         if (currentSpace != null)
         {
             int[] indexArray = getIndex(currentSpace);
             ChessPiece activePiece = GameManager.currentInstance.activePiece;
+
+            //Determine newSpaceRow and newSpaceColumn by checking arguments
             switch (direction)
-            {				//Determine newSpaceRow and newSpaceColumn by checking arguments
+            {				
                 case (SpaceDirection.FrontLeft):
-                    if (PieceColor == TeamColor.Black)
+                    if (pieceColor == TeamColor.Black)
                     {
                         indexArray[0] += 1; //Column
                         indexArray[1] -= 1; //Row
                     }
-                    else if (PieceColor == TeamColor.White)
+                    else if (pieceColor == TeamColor.White)
                     {
                         indexArray[0] -= 1; //Column
                         indexArray[1] += 1; //Row
@@ -106,23 +113,23 @@ public class Board {
                     break;
 
                 case (SpaceDirection.Front):
-                    if (PieceColor == TeamColor.Black)
+                    if (pieceColor == TeamColor.Black)
                     {
                         indexArray[1] -= 1; //Row
                     }
-                    else if (PieceColor == TeamColor.White)
+                    else if (pieceColor == TeamColor.White)
                     {
                         indexArray[1] += 1; //Row
                     }
                     break;
 
                 case (SpaceDirection.FrontRight):
-                    if (PieceColor == TeamColor.Black)
+                    if (pieceColor == TeamColor.Black)
                     {
                         indexArray[0] -= 1; //Column
                         indexArray[1] -= 1; //Row
                     }
-                    else if (PieceColor == TeamColor.White)
+                    else if (pieceColor == TeamColor.White)
                     {
                         indexArray[0] += 1; //Column
                         indexArray[1] += 1; //Row
@@ -130,34 +137,34 @@ public class Board {
                     break;
 
                 case (SpaceDirection.Left):
-                    if (PieceColor == TeamColor.Black)
+                    if (pieceColor == TeamColor.Black)
                     {
                         indexArray[0] += 1; //Column
                     }
-                    else if (PieceColor == TeamColor.White)
+                    else if (pieceColor == TeamColor.White)
                     {
                         indexArray[0] -= 1; //Column
                     }
                     break;
 
                 case (SpaceDirection.Right):
-                    if (PieceColor == TeamColor.Black)
+                    if (pieceColor == TeamColor.Black)
                     {
                         indexArray[0] -= 1; //Column
                     }
-                    else if (PieceColor == TeamColor.White)
+                    else if (pieceColor == TeamColor.White)
                     {
                         indexArray[0] += 1; //Column
                     }
                     break;
 
                 case (SpaceDirection.BackLeft):
-                    if (PieceColor == TeamColor.Black)
+                    if (pieceColor == TeamColor.Black)
                     {
                         indexArray[0] += 1; //Column
                         indexArray[1] += 1; //Row
                     }
-                    else if (PieceColor == TeamColor.White)
+                    else if (pieceColor == TeamColor.White)
                     {
                         indexArray[0] -= 1; //Column
                         indexArray[1] -= 1; //Row
@@ -165,23 +172,23 @@ public class Board {
                     break;
 
                 case (SpaceDirection.Back):
-                    if (PieceColor == TeamColor.Black)
+                    if (pieceColor == TeamColor.Black)
                     {
                         indexArray[1] += 1; //Row
                     }
-                    else if (PieceColor == TeamColor.White)
+                    else if (pieceColor == TeamColor.White)
                     {
                         indexArray[1] -= 1; //Row
                     }
                     break;
 
                 case (SpaceDirection.BackRight):
-                    if (PieceColor == TeamColor.Black)
+                    if (pieceColor == TeamColor.Black)
                     {
                         indexArray[0] -= 1; //Column
                         indexArray[1] += 1; //Row
                     }
-                    else if (PieceColor == TeamColor.White)
+                    else if (pieceColor == TeamColor.White)
                     {
                         indexArray[0] += 1; //Column
                         indexArray[1] -= 1; //Row
@@ -196,48 +203,61 @@ public class Board {
                 return null;
             }
             BoardSpace newSpace = spaces[indexArray[0], indexArray[1]];
+            if (checkSpace(newSpace))
+            {
+                return newSpace;
+            }
+                
+        }
+        return null;
+    }
 
+    /// <summary>
+    /// Returns the passed in BoardSpace if it is a valid move location for the activePiece. Returns null otherwise.
+    /// </summary>
+    /// <returns></returns>
+    public BoardSpace checkSpace(BoardSpace spaceToCheck){
+            ChessPiece activePiece = GameManager.currentInstance.activePiece;
+            TeamColor PieceColor = activePiece.PieceColor;
             //HANDLE KNIGHTS' LACK OF COLLISION
             if ((activePiece != null) && (activePiece.GetType() == typeof(Knight)))
             {
                 if ((activePiece as Knight).IsLastSpace)
                 {
-                    if ((newSpace.OccupyingPiece != null) && (newSpace.OccupyingPiece.PieceColor == PieceColor))
+                    if ((spaceToCheck.OccupyingPiece != null) && (spaceToCheck.OccupyingPiece.PieceColor == PieceColor))
                     {
-                        newSpace.spaceState = SpaceState.Blocked;
+                        spaceToCheck.spaceState = SpaceState.Blocked;
                         return null;
                     }
-                    if ((newSpace.OccupyingPiece != null) && (newSpace.OccupyingPiece.PieceColor != PieceColor))
+                    if ((spaceToCheck.OccupyingPiece != null) && (spaceToCheck.OccupyingPiece.PieceColor != PieceColor))
                     {
-                        newSpace.spaceState = SpaceState.Contested;
-                        return spaces[indexArray[0], indexArray[1]];
+                        spaceToCheck.spaceState = SpaceState.Contested;
+                        return spaceToCheck;
                     }
-                    newSpace.spaceState = SpaceState.Open;
-                    return spaces[indexArray[0], indexArray[1]];
+                    spaceToCheck.spaceState = SpaceState.Open;
+                    return spaceToCheck;
                 }
-                newSpace.spaceState = SpaceState.Default;
-                return newSpace;
+                spaceToCheck.spaceState = SpaceState.Default;
+                return spaceToCheck;
             }
             else
             {
-                if ((newSpace.OccupyingPiece != null) && (newSpace.OccupyingPiece.PieceColor == PieceColor))
+                if ((spaceToCheck.OccupyingPiece != null) && (spaceToCheck.OccupyingPiece.PieceColor == PieceColor))
                 {
-                    newSpace.spaceState = SpaceState.Blocked;
+                    spaceToCheck.spaceState = SpaceState.Blocked;
                     return null;
                 }
-                if ((newSpace.OccupyingPiece != null) && (newSpace.OccupyingPiece.PieceColor != PieceColor))
+                if ((spaceToCheck.OccupyingPiece != null) && (spaceToCheck.OccupyingPiece.PieceColor != PieceColor))
                 {
-                    newSpace.spaceState = SpaceState.Contested;
-                    return spaces[indexArray[0], indexArray[1]];
+                    spaceToCheck.spaceState = SpaceState.Contested;
+                    return spaceToCheck;
                 }
-                newSpace.spaceState = SpaceState.Open;
-                return spaces[indexArray[0], indexArray[1]];
+                spaceToCheck.spaceState = SpaceState.Open;
+                return spaceToCheck;
             }
         }
-        else {
-            return null;
-        }
-    }
+        
+
 
     public void clearAvailableSpaces() {
         foreach (BoardSpace space in spaces) {
@@ -247,4 +267,18 @@ public class Board {
         return;
     }
 
+    /// <summary>
+    /// Returns true if the space is checked by a piece of the specified teamcolor. Returns false otherwise.
+    /// </summary>
+    /// <param name="space"></param>
+    /// <param name="opposingTeam"></param>
+    /// <returns></returns>
+    //public bool isSpaceChecked(BoardSpace space, TeamColor opposingTeam) 
+    //{
+    //    BoardSpace temp = space;
+    //    //Check FrontLeft Diagonal
+    //    while ((temp != null) && !(endOfBoard))   {
+    //        getAdjacentSpace()
+    //    }
+    //}
 }

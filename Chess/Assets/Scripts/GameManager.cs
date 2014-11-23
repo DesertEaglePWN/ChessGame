@@ -29,24 +29,19 @@ public enum GameState {Wait, Select, Action};
 public class GameManager : MonoBehaviour
 {
     public static GameManager currentInstance;
-    public static MaterialLibrary materialLibrary;
+    public MaterialLibrary materialLibrary;
     private GameMode currentGameMode = GameMode.Classic;
     private GameState currentGameState = GameState.Select;
-    private bool enPassantPossible = false;
+    //private bool enPassantPossible = false;
     public bool EnPassantPossible { get; set; }
-    public ChessPiece activePiece;
+    public ChessPiece activePiece = null;
     public TeamColor turnTeamColor = TeamColor.Black;
     public Board Board {get; private set;}
-
-
-    /// <summary>
-    /// A Vector3 used for position calculations.
-    /// </summary>
-    protected Vector3 Position;
 
     void Awake()
     {
         currentInstance = this;
+        materialLibrary = this.gameObject.GetComponent<MaterialLibrary>();
     }
 
     void Start()
@@ -56,18 +51,37 @@ public class GameManager : MonoBehaviour
 
     public void AdvanceGameState() 
     {
+        ChessPiece[] Pieces = GameObject.FindObjectsOfType<ChessPiece>();
         switch (currentGameState) 
         { 
             case GameState.Wait:
                 currentGameState = GameState.Wait;
+                foreach (ChessPiece Piece in Pieces)
+                {
+                    if (Piece != activePiece) {
+                        Piece.collider.enabled = false;
+                    }
+                    
+                }
                 break;
             case GameState.Select:
                 currentGameState = GameState.Action;
+                foreach (ChessPiece Piece in Pieces)
+                {
+                    if (Piece != activePiece)
+                    {
+                        Piece.collider.enabled = false;
+                    }
+                }
                 break;
             case GameState.Action:
                 currentGameState = GameState.Select;
-                activePiece = null;
+                foreach (ChessPiece Piece in Pieces)
+                {
+                    Piece.collider.enabled = true;
+                }
                 Board.clearAvailableSpaces();
+                activePiece = null;
                 break;
         
         }
@@ -99,20 +113,12 @@ public class GameManager : MonoBehaviour
 
     public void SelectPiece(ChessPiece piece)
     {
-        if (turnTeamColor == piece.PieceColor)
-        {
-            if (activePiece == piece)
-            {
-                DeselectPiece(piece);
-            }
-            else
-            {
                 activePiece = piece;
                 BoardSpace[] availableSpaces = piece.GetAvailableSpaces();
+                Debug.Log(availableSpaces.Length);
                 DisplaySpaces(availableSpaces);
                 AdvanceGameState();
-            }
-        }
+               
         return;
     }
 
@@ -124,6 +130,7 @@ public class GameManager : MonoBehaviour
             HideSpaces(availableSpaces);
             AdvanceGameState();
             HideSpaces(availableSpaces);
+            activePiece = null;
         }
     }
 
@@ -142,11 +149,8 @@ public class GameManager : MonoBehaviour
     /// <param name="destination"></param>
     public void MovePiece(ChessPiece piece, BoardSpace destination) 
     {
-        Position.x = destination.transform.position.x;
-        Position.z = destination.transform.position.z;
-        Position.y = piece.transform.position.y;
-        piece.transform.position = Position;
-        piece.currentSpace.OccupyingPiece = null;
+        piece.transform.position = new Vector3(destination.transform.position.x,piece.transform.position.y, destination.transform.position.z);
+        piece.currentSpace.OccupyingPiece = null;   //clear old space's OccupyingPiece
         piece.currentSpace = destination;
         destination.OccupyingPiece = piece;
         piece.bHasMoved = true;
@@ -156,15 +160,28 @@ public class GameManager : MonoBehaviour
 
     public void RemovePiece(ChessPiece piece) {
         GameObject.Destroy(piece.gameObject);
-    
     }
     public void DisplaySpaces(BoardSpace[] spacesToDisplay)
     {
         foreach (BoardSpace space in spacesToDisplay)
         {
             if (space != null)
-            {   
+            {
                 Renderer meshRenderer = space.GetComponent<Renderer>();
+                switch (space.spaceState){
+                    case SpaceState.Contested:
+                        meshRenderer.material = materialLibrary.materialSpaceContested;
+                        break;
+                    case SpaceState.Open:
+                        meshRenderer.material = materialLibrary.materialSpaceOpen;
+                        break;
+                    case SpaceState.Blocked:
+                        meshRenderer.material = materialLibrary.materialSpaceOpen;
+                        break;
+                    default:
+                        meshRenderer.material = materialLibrary.materialSpaceOpen;
+                        break;
+                }
                 meshRenderer.enabled = true;
             }
         }
@@ -177,10 +194,8 @@ public class GameManager : MonoBehaviour
         {
             if (space != null)
             {
-                space.spaceState = SpaceState.Default;
                 Renderer meshRenderer = space.GetComponent<Renderer>();
                 meshRenderer.enabled = false;
-                AdvanceGameState();
             }
         }
     }

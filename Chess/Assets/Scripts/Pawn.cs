@@ -42,7 +42,7 @@ public class Pawn : ChessPiece
             {
                 EnPassantCheck(nextSpace);
                 nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(nextSpace, SpaceDirection.Front, PieceColor);    //get the next forward space
-                if ((nextSpace != null) && (nextSpace.spaceState != SpaceState.Blocked) && (nextSpace.spaceState != SpaceState.Contested))  //if next forward space is not blocked or contested...
+                if (nextSpace.spaceState == SpaceState.Open)  //if next forward space is not blocked or contested...
                 {
                     possibleSpaces.Add(nextSpace); //add it to possibleSpaces
                 }
@@ -54,36 +54,42 @@ public class Pawn : ChessPiece
         BoardSpace captureSpace;
 
         captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontLeft, PieceColor); //check if front left is contested
-        if ((captureSpace != null) && (captureSpace.spaceState == SpaceState.Contested))
-        {
-            possibleSpaces.Add(captureSpace);
-        }
-        else if (captureSpace != null)
-        {
-            captureSpace.spaceState = SpaceState.Default;
+        if (captureSpace != null){
+            if (captureSpace.spaceState == SpaceState.Contested)
+            {
+                possibleSpaces.Add(captureSpace);
+            }
+            else
+            {
+                captureSpace.spaceState = SpaceState.Default;
+            }
         }
 
         captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontRight, PieceColor); //check if front right is contested
-        if ((captureSpace != null) && (captureSpace.spaceState == SpaceState.Contested))
-        {
-            possibleSpaces.Add(captureSpace);
-        }
-        else if (captureSpace != null)
-        {
-            captureSpace.spaceState = SpaceState.Default;
+        if (captureSpace != null){
+            if (captureSpace.spaceState == SpaceState.Contested)
+            {
+                possibleSpaces.Add(captureSpace);
+            }
+            else
+            {
+                captureSpace.spaceState = SpaceState.Default;
+            }
         }
 
         //HANDLE EN PASSANT CAPTURES (Only done if an En Passant move may exist)
         if (GameManager.currentInstance.EnPassantPossible)
         {
             captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Left, PieceColor); //check if left is contested by En Passant threatened pawn
-            if ((captureSpace != null) && (captureSpace.spaceState == SpaceState.Contested) && (captureSpace.OccupyingPiece.GetType() == typeof(Pawn)))
-            {
-                if ((captureSpace.OccupyingPiece as Pawn).enPassantThreatened)
+            if (captureSpace != null){
+                if ((captureSpace.spaceState == SpaceState.Contested) && (captureSpace.OccupyingPiece.GetType() == typeof(Pawn)))
                 {
-                    captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(captureSpace, SpaceDirection.Front, PieceColor);
-                    captureSpace.spaceState = SpaceState.Contested;
-                    possibleSpaces.Add(captureSpace);
+                    if ((captureSpace.OccupyingPiece as Pawn).enPassantThreatened)
+                    {
+                        captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(captureSpace, SpaceDirection.Front, PieceColor);
+                        captureSpace.spaceState = SpaceState.Contested;
+                        possibleSpaces.Add(captureSpace);
+                    }
                 }
             }
 
@@ -98,6 +104,7 @@ public class Pawn : ChessPiece
                 }
             }
         }
+        Debug.Log(possibleSpaces.Count);
         return possibleSpaces.ToArray();
     }
 

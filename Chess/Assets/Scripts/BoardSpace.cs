@@ -12,12 +12,10 @@ public enum SpaceState {Default, Open, Blocked, Contested};
 
 
 public class BoardSpace : MonoBehaviour {
-	public MaterialLibrary materialLibrary;
-
 	public char spaceColumn;
 	public char spaceRow;
 	//public char spaceColor;
-	public SpaceState spaceState = SpaceState.Open;
+	public SpaceState spaceState = SpaceState.Default;
 
    [SerializeField]
    private ChessPiece occupyingPiece;
@@ -36,25 +34,25 @@ public class BoardSpace : MonoBehaviour {
 	}
 
 	void OnMouseEnter(){
-        Debug.Log(spaceState);
 		switch (spaceState) {
 			case(SpaceState.Open):
-				this.renderer.material = materialLibrary.materialSpaceOpenHover;
+				this.renderer.material = GameManager.currentInstance.materialLibrary.materialSpaceOpenHover;
 				break;
 			case(SpaceState.Contested):
-				this.renderer.material = materialLibrary.materialSpaceContestedHover;
+                this.renderer.material = GameManager.currentInstance.materialLibrary.materialSpaceContestedHover;
 				break;
 		}
+        Debug.Log(spaceState);
 		return;
 	}
 
 	void OnMouseExit(){
 		switch (spaceState) {
 			case(SpaceState.Open):
-				this.renderer.material = materialLibrary.materialSpaceOpen;
+                this.renderer.material = GameManager.currentInstance.materialLibrary.materialSpaceOpen;
 				break;
 			case(SpaceState.Contested):
-				this.renderer.material = materialLibrary.materialSpaceContested;
+                this.renderer.material = GameManager.currentInstance.materialLibrary.materialSpaceContested;
 				break;
 		}
 		
@@ -65,7 +63,6 @@ public class BoardSpace : MonoBehaviour {
         if (spaceState == SpaceState.Open)
         {
             GameManager.currentInstance.MovePiece(this);
-            OccupyingPiece = GameManager.currentInstance.activePiece;
             GameManager.currentInstance.AdvanceGameState();
         }
         else if (spaceState == SpaceState.Contested)
@@ -81,7 +78,6 @@ public class BoardSpace : MonoBehaviour {
             OccupyingPiece = GameManager.currentInstance.activePiece;
             GameManager.currentInstance.AdvanceGameState();
         }
-		return;
 	}
 
 //Use to test for overlaping colliders

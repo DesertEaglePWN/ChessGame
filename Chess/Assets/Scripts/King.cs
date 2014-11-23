@@ -12,12 +12,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class King : ChessPiece{
+public class King : ChessPiece
+{
 
     public override BoardSpace[] GetAvailableSpaces()
     {
         //Debug.Log (activeSpace.getSpace(SpaceDirection.Front,PieceColor));
         List<BoardSpace> possibleSpaces = new List<BoardSpace>();
+
+        //GET BASE MOVE AND CAPTURE SPACES
         possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontLeft, PieceColor));
         possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, PieceColor));
         possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontRight, PieceColor));
@@ -26,10 +29,61 @@ public class King : ChessPiece{
         possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.BackLeft, PieceColor));
         possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Back, PieceColor));
         possibleSpaces.Add(GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.BackRight, PieceColor));
+
         return possibleSpaces.ToArray();
     }
 
+    public bool isChecked()
+    {
+        return false;
+    }
 
+
+    /// <summary>
+    /// Returns true if the King is in check from a piece in the specified direction.
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <returns></returns>
+    private bool checkedFromDirection(SpaceDirection direction)
+    {
+        BoardSpace checkSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, direction, PieceColor);
+        switch (direction)
+        {
+            case (SpaceDirection.FrontLeft):
+                while ((checkSpace != null) && (GameManager.currentInstance.Board.isSpaceAvailable(checkSpace, PieceColor)))
+                {
+                    if ((checkSpace.OccupyingPiece != null))
+                    {
+                        Type occupyingPieceType = checkSpace.OccupyingPiece.GetType();
+                    }
+                    if (checkSpace.spaceState == SpaceState.Contested)
+                    {
+                        break;
+                    }
+                    checkSpace = GameManager.currentInstance.Board.getAdjacentSpace(checkSpace, direction, PieceColor);
+                }
+                break;
+        }
+        return false;
+    }
+
+
+    //private BoardSpace[] getCheckedSpaces()
+    //{
+    //    BoardSpace tempSpace = currentSpace;
+    //    //FRONTLEFT SPACE
+    //    tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace,SpaceDirection.FrontLeft);
+    //        //FRONT
+    //        isChecked();
+    //    while (tempSpace != null && GameManager.currentInstance.Board.isSpaceAvailable(tempSpace, PieceColor))
+    //    {
+    //        availableSpaces.Add(checkSpace);
+    //        if (checkSpace.spaceState == SpaceState.Contested)
+    //        {
+    //            break;
+    //        }
+    //        checkSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, direction, PieceColor);
+    //    }
+
+    //}
 }
-
-

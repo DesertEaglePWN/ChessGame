@@ -52,6 +52,7 @@
      <Compile Include="Assets\Scripts\BoardSpace.cs" />
      <Compile Include="Assets\Scripts\CameraMovement.cs" />
      <Compile Include="Assets\Scripts\ChessPiece.cs" />
+     <Compile Include="Assets\Scripts\GUI.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\King.cs" />
      <Compile Include="Assets\Scripts\Knight.cs" />
