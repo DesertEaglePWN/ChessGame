@@ -42,7 +42,6 @@ public class BoardSpace : MonoBehaviour {
                 this.renderer.material = GameManager.currentInstance.materialLibrary.materialSpaceContestedHover;
 				break;
 		}
-        Debug.Log(spaceState);
 		return;
 	}
 
@@ -70,14 +69,15 @@ public class BoardSpace : MonoBehaviour {
             if (this.OccupyingPiece != null) {  
                 GameManager.currentInstance.RemovePiece(this.OccupyingPiece);   //default capture case
             }
-            else if (GameManager.currentInstance.EnPassantPossible) {
-                 BoardSpace enPassantSpace = GameManager.currentInstance.Board.getAdjacentSpace(this, SpaceDirection.Back, GameManager.currentInstance.activePiece.PieceColor);
+            else if (Pawn.EnPassantPossible) {
+                 BoardSpace enPassantSpace = GameManager.currentInstance.Board.getAdjacentSpace(this, SpaceDirection.Back, GameManager.currentInstance.activePiece.PieceColor,false);
                  GameManager.currentInstance.RemovePiece(enPassantSpace.OccupyingPiece);
             }
             GameManager.currentInstance.MovePiece(this);
             OccupyingPiece = GameManager.currentInstance.activePiece;
             GameManager.currentInstance.AdvanceGameState();
         }
+     
 	}
 
 //Use to test for overlaping colliders

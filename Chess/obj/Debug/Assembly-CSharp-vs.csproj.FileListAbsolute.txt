@@ -8,3 +8,4 @@ C:\Users\Austin\Documents\Chess\Temp\bin\Debug\Unity.DataContract.dll
 C:\Users\Austin\Documents\Chess\Temp\bin\Debug\ICSharpCode.NRefactory.dll
 C:\Users\Austin\Documents\Chess\obj\Debug\Assembly-CSharp.dll
 C:\Users\Austin\Documents\Chess\obj\Debug\Assembly-CSharp.pdb
+C:\Users\Austin\Documents\Chess\obj\Debug\Assembly-CSharp-vs.csprojResolveAssemblyReference.cache

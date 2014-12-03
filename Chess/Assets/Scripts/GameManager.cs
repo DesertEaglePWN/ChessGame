@@ -32,11 +32,13 @@ public class GameManager : MonoBehaviour
     public MaterialLibrary materialLibrary;
     private GameMode currentGameMode = GameMode.Classic;
     private GameState currentGameState = GameState.Select;
-    //private bool enPassantPossible = false;
-    public bool EnPassantPossible { get; set; }
+
+  //  public bool EnPassantPossible { get; set; }
     public ChessPiece activePiece = null;
     public TeamColor turnTeamColor = TeamColor.Black;
     public Board Board {get; private set;}
+    BoardSpace[] availableSpaces;
+    ChessPiece[] chessPieces;
 
     void Awake()
     {
@@ -47,40 +49,28 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         Board = new Board(GameObject.FindObjectsOfType<BoardSpace>()); //Create the Board
+        chessPieces = GameObject.FindObjectsOfType<ChessPiece>();    //Store all ChessPieces for later
     }
 
     public void AdvanceGameState() 
     {
-        ChessPiece[] Pieces = GameObject.FindObjectsOfType<ChessPiece>();
         switch (currentGameState) 
         { 
             case GameState.Wait:
                 currentGameState = GameState.Wait;
-                foreach (ChessPiece Piece in Pieces)
-                {
-                    if (Piece != activePiece) {
-                        Piece.collider.enabled = false;
-                    }
-                    
-                }
                 break;
             case GameState.Select:
                 currentGameState = GameState.Action;
-                foreach (ChessPiece Piece in Pieces)
-                {
-                    if (Piece != activePiece)
-                    {
-                        Piece.collider.enabled = false;
-                    }
-                }
+                InactiveColliderEnable(false);
                 break;
             case GameState.Action:
-                currentGameState = GameState.Select;
-                foreach (ChessPiece Piece in Pieces)
-                {
-                    Piece.collider.enabled = true;
+                foreach (BoardSpace space in Board.spaces) 
+               {
+                   space.spaceState = SpaceState.Default;
                 }
-                Board.clearAvailableSpaces();
+                currentGameState = GameState.Select;
+                InactiveColliderEnable(true);
+                HideSpaces(availableSpaces);
                 activePiece = null;
                 break;
         
@@ -96,6 +86,7 @@ public class GameManager : MonoBehaviour
                 turnTeamColor = TeamColor.Black;
                 break;
         }
+        
     }
 
     /// <summary>
@@ -114,8 +105,14 @@ public class GameManager : MonoBehaviour
     public void SelectPiece(ChessPiece piece)
     {
                 activePiece = piece;
-                BoardSpace[] availableSpaces = piece.GetAvailableSpaces();
-                Debug.Log(availableSpaces.Length);
+                availableSpaces = piece.GetAvailableSpaces();
+
+                //Debug.Log("Available Spaces-----");
+                //foreach (BoardSpace space in availableSpaces) {
+                //    Debug.Log(space);
+                //}
+                //Debug.Log("---------------------");
+
                 DisplaySpaces(availableSpaces);
                 AdvanceGameState();
                
@@ -149,6 +146,9 @@ public class GameManager : MonoBehaviour
     /// <param name="destination"></param>
     public void MovePiece(ChessPiece piece, BoardSpace destination) 
     {
+        if ((piece.GetType() == typeof(King)) && ((piece as King).CanCastle)) {
+            castleMove(piece, destination);
+        }
         piece.transform.position = new Vector3(destination.transform.position.x,piece.transform.position.y, destination.transform.position.z);
         piece.currentSpace.OccupyingPiece = null;   //clear old space's OccupyingPiece
         piece.currentSpace = destination;
@@ -168,6 +168,7 @@ public class GameManager : MonoBehaviour
             if (space != null)
             {
                 Renderer meshRenderer = space.GetComponent<Renderer>();
+                Collider spaceCollider = space.GetComponent<Collider>();
                 switch (space.spaceState){
                     case SpaceState.Contested:
                         meshRenderer.material = materialLibrary.materialSpaceContested;
@@ -183,6 +184,7 @@ public class GameManager : MonoBehaviour
                         break;
                 }
                 meshRenderer.enabled = true;
+                spaceCollider.enabled = true;
             }
         }
 
@@ -195,8 +197,79 @@ public class GameManager : MonoBehaviour
             if (space != null)
             {
                 Renderer meshRenderer = space.GetComponent<Renderer>();
+                Collider spaceCollider = space.GetComponent<Collider>();
                 meshRenderer.enabled = false;
+                spaceCollider.enabled = false;
             }
+        }
+    }
+
+    /// <summary>
+    /// Enables/Disables colliders for all chess pieces besides the active piece. 
+    /// (True to Enable; False to Disable)
+    /// </summary>
+    /// <param name="Enable"></param>
+    public void InactiveColliderEnable(bool Enable) 
+    {
+        foreach (ChessPiece piece in chessPieces)
+        {
+            if ((piece != activePiece) && (piece != null))
+            {
+                if (Enable == true) 
+                {
+                    piece.collider.enabled = true;
+                }
+                else if (Enable == false)
+                {
+                    piece.collider.enabled = false;
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Checks whether or not a Castle Move occured and moves the appropriate Rook if so.
+    /// </summary>
+    /// <param name="king"></param>
+    /// <param name="destination"></param>
+    private void castleMove(ChessPiece king, BoardSpace destination) {
+        ChessPiece rook;
+        BoardSpace rookSpace;
+        Debug.Log("Running castleMove()");
+        switch (king.PieceColor)
+        {
+            case (TeamColor.Black):
+                if (destination.name == "C8")
+                {
+                    rook = GameObject.Find("A8").GetComponent<BoardSpace>().OccupyingPiece;
+                    rookSpace = GameObject.Find("D8").GetComponent<BoardSpace>();
+                    MovePiece(rook, rookSpace);
+                    turnTeamColor = king.PieceColor;
+                }
+                else if (destination.name == "G8")
+                {
+                    rook = GameObject.Find("H8").GetComponent<BoardSpace>().OccupyingPiece;
+                    rookSpace = GameObject.Find("F8").GetComponent<BoardSpace>();
+                    MovePiece(rook, rookSpace);
+                    turnTeamColor = king.PieceColor;
+                }
+                break;
+            case (TeamColor.White):
+                if (destination.name == "C1")
+                {
+                    rook = GameObject.Find("A1").GetComponent<BoardSpace>().OccupyingPiece;
+                    rookSpace = GameObject.Find("D1").GetComponent<BoardSpace>();
+                    MovePiece(rook, rookSpace);
+                    turnTeamColor = king.PieceColor;
+                }
+                else if (destination.name == "G1")
+                {
+                    rook = GameObject.Find("H1").GetComponent<BoardSpace>().OccupyingPiece;
+                    rookSpace = GameObject.Find("F1").GetComponent<BoardSpace>();
+                    MovePiece(rook, rookSpace);
+                    turnTeamColor = king.PieceColor;
+                }
+                break;
         }
     }
 }

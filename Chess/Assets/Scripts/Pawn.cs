@@ -14,99 +14,106 @@ using UnityEngine;
 
 public class Pawn : ChessPiece
 {
-
-    private bool enPassantThreatened = false;
     public bool EnPassantThreatened { get; set; }
+    public static bool EnPassantPossible;
 
     public override BoardSpace[] GetAvailableSpaces()
     {
         List<BoardSpace> possibleSpaces = new List<BoardSpace>();
 
-        //CLEAR EN PASSANT
-        if (GameManager.currentInstance.EnPassantPossible)
-        {
-            enPassantThreatened = false; //piece is still in play, clear enPassantThreatened 
-            //GameManager.currentInstance.EnPassantPossible = false;
-        }
-
-        //GET BASE MOVE SPACES
-        BoardSpace nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, PieceColor);
+        //Basic Movement
+        BoardSpace nextSpace;
+        nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, PieceColor, true);
         if (nextSpace != null) 
         {
-            if ((nextSpace.spaceState != SpaceState.Blocked) && (nextSpace.spaceState != SpaceState.Contested))      //if next forward space is not blocked or contested...
+            if ((nextSpace.spaceState != SpaceState.Contested) && (nextSpace.spaceState != SpaceState.Blocked)) //if the nextSpace is not Contested or Blocked
             {
                 possibleSpaces.Add(nextSpace);
             }
-
-            if (!bHasMoved)
+            else
             {
-                EnPassantCheck(nextSpace);
-                nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(nextSpace, SpaceDirection.Front, PieceColor);    //get the next forward space
-                if (nextSpace.spaceState == SpaceState.Open)  //if next forward space is not blocked or contested...
+                return possibleSpaces.ToArray();
+            }
+        }
+        if (!bHasMoved)
+        {
+            EnPassantCheck(nextSpace);
+            nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(nextSpace, SpaceDirection.Front, PieceColor,true);
+            if (nextSpace != null)
+            {
+                if ((nextSpace.spaceState != SpaceState.Contested) && (nextSpace.spaceState != SpaceState.Blocked))
                 {
-                    possibleSpaces.Add(nextSpace); //add it to possibleSpaces
+                    possibleSpaces.Add(nextSpace);
+                }
+                else
+                {
+                    return possibleSpaces.ToArray();
                 }
             }
         }
-
-
-        //GET BASE CAPTURE SPACES
+        //Basic Capture--------------------------------------------------
         BoardSpace captureSpace;
-
-        captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontLeft, PieceColor); //check if front left is contested
-        if (captureSpace != null){
-            if (captureSpace.spaceState == SpaceState.Contested)
-            {
-                possibleSpaces.Add(captureSpace);
-            }
-            else
-            {
-                captureSpace.spaceState = SpaceState.Default;
-            }
-        }
-
-        captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontRight, PieceColor); //check if front right is contested
-        if (captureSpace != null){
-            if (captureSpace.spaceState == SpaceState.Contested)
-            {
-                possibleSpaces.Add(captureSpace);
-            }
-            else
-            {
-                captureSpace.spaceState = SpaceState.Default;
-            }
-        }
-
-        //HANDLE EN PASSANT CAPTURES (Only done if an En Passant move may exist)
-        if (GameManager.currentInstance.EnPassantPossible)
+        captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontLeft, PieceColor, true);
+        if (GameManager.currentInstance.Board.checkSpace(captureSpace) != null)
         {
-            captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Left, PieceColor); //check if left is contested by En Passant threatened pawn
-            if (captureSpace != null){
+            if (captureSpace.spaceState == SpaceState.Contested)
+            {
+                possibleSpaces.Add(captureSpace);
+            }
+        }
+        captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontRight, PieceColor, true);
+        if (GameManager.currentInstance.Board.checkSpace(captureSpace) != null)
+        {
+            if (captureSpace.spaceState == SpaceState.Contested)
+            {
+                possibleSpaces.Add(captureSpace);
+            }
+        }
+        //--------------------------------------------------------------
+        //EnPassant Captures (Only done if an En Passant move may exist)
+        if (Pawn.EnPassantPossible)
+        {
+            captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Left, PieceColor, false); //check if left is contested by En Passant threatened pawn
+            if (captureSpace != null)
+            {
+                GameManager.currentInstance.Board.checkSpace(captureSpace);
                 if ((captureSpace.spaceState == SpaceState.Contested) && (captureSpace.OccupyingPiece.GetType() == typeof(Pawn)))
                 {
-                    if ((captureSpace.OccupyingPiece as Pawn).enPassantThreatened)
+                    if ((captureSpace.OccupyingPiece as Pawn).EnPassantThreatened)
                     {
-                        captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(captureSpace, SpaceDirection.Front, PieceColor);
-                        captureSpace.spaceState = SpaceState.Contested;
-                        possibleSpaces.Add(captureSpace);
+                        captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(captureSpace, SpaceDirection.Front, PieceColor, false);
+                        if (GameManager.currentInstance.Board.checkSpace(captureSpace) != null)
+                        {
+                            captureSpace.spaceState = SpaceState.Contested;
+                            possibleSpaces.Add(captureSpace);
+                        }
                     }
                 }
             }
 
-            captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Right, PieceColor); //check if right is contested by En Passant threatened pawn
-            if ((captureSpace != null) && (captureSpace.spaceState == SpaceState.Contested) && (captureSpace.OccupyingPiece.GetType() == typeof(Pawn)))
+            captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Right, PieceColor, false); //check if left is contested by En Passant threatened pawn
+            if (captureSpace != null)
             {
-                if ((captureSpace.OccupyingPiece as Pawn).enPassantThreatened)
+                GameManager.currentInstance.Board.checkSpace(captureSpace);
+                if ((captureSpace.spaceState == SpaceState.Contested) && (captureSpace.OccupyingPiece.GetType() == typeof(Pawn)))
                 {
-                    captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(captureSpace, SpaceDirection.Front, PieceColor);
-                    captureSpace.spaceState = SpaceState.Contested;
-                    possibleSpaces.Add(captureSpace);
+                    if ((captureSpace.OccupyingPiece as Pawn).EnPassantThreatened)
+                    {
+                        captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(captureSpace, SpaceDirection.Front, PieceColor, false);
+                        if (GameManager.currentInstance.Board.checkSpace(captureSpace) != null)
+                        {
+                            captureSpace.spaceState = SpaceState.Contested;
+                            possibleSpaces.Add(captureSpace);
+                        }
+                    }
                 }
             }
         }
-        Debug.Log(possibleSpaces.Count);
+        //--------------------------------------------------------------
+        //Debug.Log(possibleSpaces.Count);
         return possibleSpaces.ToArray();
     }
+    
 
     /// <summary>
     /// Checks if there is a Pawn in position for En Passant; updates the private bool enPassantThreatened.
@@ -115,29 +122,35 @@ public class Pawn : ChessPiece
     /// <returns></returns>
     void EnPassantCheck(BoardSpace firstSpace)
     {
+        //Debug.Log("EnPassantCheck() ran");
         //Check for an enPassant Pawn
-        BoardSpace frontLeftSpace = GameManager.currentInstance.Board.getAdjacentSpace(firstSpace, SpaceDirection.FrontLeft, PieceColor);
-        BoardSpace frontRightSpace = GameManager.currentInstance.Board.getAdjacentSpace(firstSpace, SpaceDirection.FrontRight, PieceColor);
+        BoardSpace frontLeftSpace = GameManager.currentInstance.Board.getAdjacentSpace(firstSpace, SpaceDirection.FrontLeft, PieceColor, false);
+        BoardSpace frontRightSpace = GameManager.currentInstance.Board.getAdjacentSpace(firstSpace, SpaceDirection.FrontRight, PieceColor, false);
+        GameManager.currentInstance.Board.checkSpace(frontLeftSpace);
+        GameManager.currentInstance.Board.checkSpace(frontRightSpace);
         if ((frontLeftSpace != null) && (frontLeftSpace.spaceState == SpaceState.Contested))
         {
             if ((frontLeftSpace.OccupyingPiece.GetType() == typeof(Pawn)))
             {
-                enPassantThreatened = true;
-                GameManager.currentInstance.EnPassantPossible = true;
+                //Debug.Log("In Here(L)");
+                EnPassantThreatened = true;
+                Pawn.EnPassantPossible = true;
             }
         }
         if ((frontRightSpace != null) && (frontRightSpace.spaceState == SpaceState.Contested))
         {
             if ((frontRightSpace.OccupyingPiece.GetType() == typeof(Pawn)))
             {
-                enPassantThreatened = true;
-                GameManager.currentInstance.EnPassantPossible = true;
+                //Debug.Log("In Here(R)");
+                EnPassantThreatened = true;
+                Pawn.EnPassantPossible = true;
             }
         }
     }
-
 }
 
 
-		
+
+
+
 

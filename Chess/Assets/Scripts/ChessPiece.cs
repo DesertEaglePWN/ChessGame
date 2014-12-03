@@ -13,12 +13,13 @@ public abstract class ChessPiece : MonoBehaviour
 {
     /// <summary>
     /// The piece's team color.
-    /// (Defaults to "None")
+    /// (Defaults to 'None')
     /// </summary>
-    private TeamColor pieceColor = TeamColor.None;
-
     public TeamColor PieceColor { get; private set; }
 
+    /// <summary>
+    /// True if the piece has been moved this game.
+    /// </summary>
     public bool bHasMoved = false;
 
     /// <summary>
@@ -26,21 +27,16 @@ public abstract class ChessPiece : MonoBehaviour
     /// </summary>
     public BoardSpace currentSpace;
 
-    private BoardSpace[] availableSpaces;
+    ///// <summary>
+    ///// Holds the available spaces the piece can move to.
+    ///// </summary>
+    //private BoardSpace[] availableSpaces;
 
     // Use this for initialization
     void Start()
     {
         InitPieceColor();
-        if (PieceColor == TeamColor.Black)
-        {
-            this.renderer.material = GameManager.currentInstance.materialLibrary.materialBlack;
-        }
-        else if (PieceColor == TeamColor.White)
-        {
-            this.renderer.material = GameManager.currentInstance.materialLibrary.materialWhite;
-        }
-        this.transform.position = new Vector3(currentSpace.transform.position.x,this.transform.position.y,currentSpace.transform.position.z);
+        this.transform.position = new Vector3(currentSpace.transform.position.x,this.transform.position.y,currentSpace.transform.position.z); //set position to match the currentSpace
     }
 
     // Update is called once per frame
@@ -76,18 +72,28 @@ public abstract class ChessPiece : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Finds and returns an array of BoardSpace objects that correspond to all spaces available for the piece to move to.
+    /// (Unique to each piece type)
+    /// </summary>
+    /// <returns>BoarSpace[]</returns>
     public abstract BoardSpace[] GetAvailableSpaces();
 
+    /// <summary>
+    /// Checks and initializes piece color. Applies appropriate starting materials.
+    /// </summary>
     private void InitPieceColor()
         {
             //On Start, check and update piece color and position
             if ((currentSpace.spaceRow == '1') || (currentSpace.spaceRow == '2'))
             {
                 PieceColor = TeamColor.White;
+                this.renderer.material = GameManager.currentInstance.materialLibrary.materialWhite;
             }
             else if ((currentSpace.spaceRow == '7') || (currentSpace.spaceRow == '8'))
             {
                 PieceColor = TeamColor.Black;
+                this.renderer.material = GameManager.currentInstance.materialLibrary.materialBlack;
             }
             else
             {
@@ -100,16 +106,16 @@ public abstract class ChessPiece : MonoBehaviour
     {
         List<BoardSpace> availableSpaces = new List<BoardSpace>();
 
-        BoardSpace nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, direction, PieceColor);
+        BoardSpace nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, direction, PieceColor, true);
 
-        while (nextSpace != null && GameManager.currentInstance.Board.isSpaceAvailable(nextSpace, PieceColor))
+        while (GameManager.currentInstance.Board.checkSpace(nextSpace) != null)
         {
             availableSpaces.Add(nextSpace);
             if (nextSpace.spaceState == SpaceState.Contested)
             {
                 break;
             }
-            nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(nextSpace, direction, PieceColor);
+            nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(nextSpace, direction, PieceColor, true);
         }
 
         return availableSpaces;

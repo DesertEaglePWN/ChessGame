@@ -25,7 +25,6 @@ public class Board {
 		foreach (BoardSpace space in spaceCollection) {
 			int[] indexArray = getIndex(space);
 			spaces[indexArray[0],indexArray[1]] = space;
-			//Debug.Log(spaceColumn);
 		}
 	}
 	
@@ -59,37 +58,37 @@ public class Board {
             }
         }
 
-    /// <summary>
-    /// Returns true if the adjacent space in the specified direction of the current space for the specified team color.
-    /// </summary>
-    /// <param name="currentSpace"></param>
-    /// <param name="direction"></param>
-    /// <param name="PieceColor"></param>
-    /// <returns></returns>
-    public bool isSpaceAvailable(BoardSpace spaceToCheck, TeamColor pieceColor)
-    {
-        int[] indexArray = getIndex(spaceToCheck);
-        if (spaceToCheck.OccupyingPiece != null)
-        {
-            if (spaceToCheck.OccupyingPiece.PieceColor == pieceColor)
-            {
-                spaceToCheck.spaceState = SpaceState.Blocked;
-                return false;
-            }
-            else
-            {
-                spaceToCheck.spaceState = SpaceState.Contested;
-                return true;
-            }
-        }
-        else
-        {
-            spaceToCheck.spaceState = SpaceState.Open;
-        }
-        return true;
-    }
+    ///// <summary>
+    ///// Returns true if the adjacent space in the specified direction of the current space for the specified team color.
+    ///// </summary>
+    ///// <param name="currentSpace"></param>
+    ///// <param name="direction"></param>
+    ///// <param name="PieceColor"></param>
+    ///// <returns></returns>
+    //public bool isSpaceAvailable(BoardSpace spaceToCheck, TeamColor pieceColor)
+    //{
+    //    int[] indexArray = getIndex(spaceToCheck);
+    //    if (spaceToCheck.OccupyingPiece != null)
+    //    {
+    //        if (spaceToCheck.OccupyingPiece.PieceColor == pieceColor)
+    //        {
+    //            spaceToCheck.spaceState = SpaceState.Blocked;
+    //            return false;
+    //        }
+    //        else
+    //        {
+    //            spaceToCheck.spaceState = SpaceState.Contested;
+    //            return true;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        spaceToCheck.spaceState = SpaceState.Open;
+    //    }
+    //    return true;
+    //}
 
-    public BoardSpace getAdjacentSpace(BoardSpace currentSpace, SpaceDirection direction, TeamColor pieceColor)
+    public BoardSpace getAdjacentSpace(BoardSpace currentSpace, SpaceDirection direction, TeamColor pieceColor, bool Validate)
     {
         if (currentSpace != null)
         {
@@ -203,70 +202,78 @@ public class Board {
                 return null;
             }
             BoardSpace newSpace = spaces[indexArray[0], indexArray[1]];
-            if (checkSpace(newSpace))
+            if (Validate)
             {
-                return newSpace;
+                if (checkSpace(newSpace) != null) 
+                {
+                    return newSpace;
+                }
+                else
+                {
+                    return null;
+                }
+                
             }
+            return newSpace;
                 
         }
         return null;
     }
 
     /// <summary>
+    /// Sets the spaceState for the passed in BoardSpace to reflect whether the space is open, blocked or contested.
     /// Returns the passed in BoardSpace if it is a valid move location for the activePiece. Returns null otherwise.
     /// </summary>
     /// <returns></returns>
-    public BoardSpace checkSpace(BoardSpace spaceToCheck){
-            ChessPiece activePiece = GameManager.currentInstance.activePiece;
-            TeamColor PieceColor = activePiece.PieceColor;
-            //HANDLE KNIGHTS' LACK OF COLLISION
-            if ((activePiece != null) && (activePiece.GetType() == typeof(Knight)))
+    public BoardSpace checkSpace(BoardSpace spaceToCheck)
+    {
+        ChessPiece activePiece = GameManager.currentInstance.activePiece;
+        TeamColor PieceColor = activePiece.PieceColor;
+        if ((activePiece != null) && (spaceToCheck != null))  //ensure there is and activePiece and a valid spaceToCheck
+        {
+            if (spaceToCheck.OccupyingPiece != null)    //is the space occupied
             {
-                if ((activePiece as Knight).IsLastSpace)
+                //Debug.Log(spaceToCheck.OccupyingPiece);
+                //Debug.Log(spaceToCheck.OccupyingPiece.PieceColor == PieceColor);
+                if (spaceToCheck.OccupyingPiece.PieceColor == PieceColor) //is the OccupyingPiece the same color as the activePiece
                 {
-                    if ((spaceToCheck.OccupyingPiece != null) && (spaceToCheck.OccupyingPiece.PieceColor == PieceColor))
-                    {
-                        spaceToCheck.spaceState = SpaceState.Blocked;
-                        return null;
-                    }
-                    if ((spaceToCheck.OccupyingPiece != null) && (spaceToCheck.OccupyingPiece.PieceColor != PieceColor))
-                    {
-                        spaceToCheck.spaceState = SpaceState.Contested;
-                        return spaceToCheck;
-                    }
-                    spaceToCheck.spaceState = SpaceState.Open;
-                    return spaceToCheck;
+                    spaceToCheck.spaceState = SpaceState.Blocked;   //space is blocked
+                    //Debug.Log(spaceToCheck.spaceState);
+                    return null;                                    //can't move here; return null
                 }
-                spaceToCheck.spaceState = SpaceState.Default;
-                return spaceToCheck;
+                else                                                       //is the OccupyingPiece a different color than the activePiece
+                {
+                    if (spaceToCheck.OccupyingPiece.GetType() == typeof(King))  //piece an enemy king?
+                    {
+                        spaceToCheck.spaceState = SpaceState.Blocked;       //space is blocked
+                        (spaceToCheck.OccupyingPiece as King).isChecked = true;  //Occupying piece is in check
+                        return null;                                    //can't move here; return null
+                    }
+                    else 
+                    {
+                        spaceToCheck.spaceState = SpaceState.Contested;   //space is contested
+                        return spaceToCheck;                              //can capture here; return the space
+                    }
+                }
             }
             else
             {
-                if ((spaceToCheck.OccupyingPiece != null) && (spaceToCheck.OccupyingPiece.PieceColor == PieceColor))
-                {
-                    spaceToCheck.spaceState = SpaceState.Blocked;
-                    return null;
-                }
-                if ((spaceToCheck.OccupyingPiece != null) && (spaceToCheck.OccupyingPiece.PieceColor != PieceColor))
-                {
-                    spaceToCheck.spaceState = SpaceState.Contested;
-                    return spaceToCheck;
-                }
-                spaceToCheck.spaceState = SpaceState.Open;
+;                spaceToCheck.spaceState = SpaceState.Open;
                 return spaceToCheck;
             }
         }
-        
-
-
-    public void clearAvailableSpaces() {
-        foreach (BoardSpace space in spaces) {
-            space.renderer.enabled = false;
-            space.spaceState = SpaceState.Default;
+        else
+        {
+            return null;
         }
-        return;
     }
+            //if (activePiece.GetType() == typeof (Knight)){
+            //    if ((activePiece as Knight).IsLastSpace)
+            //    {
 
+                //    }
+            //}
+        
     /// <summary>
     /// Returns true if the space is checked by a piece of the specified teamcolor. Returns false otherwise.
     /// </summary>
