@@ -21,3 +21,4 @@ C:\Users\Austin\Documents\Unity Projects\Chess\Temp\bin\Debug\Unity.DataContract
 C:\Users\Austin\Documents\Unity Projects\Chess\Temp\bin\Debug\ICSharpCode.NRefactory.dll
 C:\Users\Austin\Documents\Unity Projects\Chess\obj\Debug\Assembly-CSharp.dll
 C:\Users\Austin\Documents\Unity Projects\Chess\obj\Debug\Assembly-CSharp.pdb
+C:\Users\Austin\Documents\Unity Projects\Chess\obj\Debug\Assembly-CSharp-vs.csprojResolveAssemblyReference.cache

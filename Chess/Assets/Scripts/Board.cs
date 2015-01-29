@@ -250,7 +250,7 @@ public class Board {
             }
             else
             {
-;                spaceToCheck.spaceState = SpaceState.Open;
+                spaceToCheck.spaceState = SpaceState.Open;
                 return spaceToCheck;
             }
         }
