@@ -15,11 +15,19 @@ using UnityEngine;
 public class Queen : ChessPiece{
 
 	public override BoardSpace[] GetAvailableSpaces(){
-		//Debug.Log (activeSpace.getSpace(SpaceDirection.Front,teamColor));
-        List<BoardSpace> possibleSpaces = new List<BoardSpace>();
-        possibleSpaces.Add(gameManager.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, teamColor));
-
-        return possibleSpaces.ToArray();
+        List<BoardSpace> availableSpaces = new List<BoardSpace>();
+        
+        //GET BASE MOVE AND CAPTURE SPACES
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.FrontLeft));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.Front));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.FrontRight));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.Left));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.Right));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.BackLeft));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.Back));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.BackRight));
+        
+        return availableSpaces.ToArray();
 	}
 
 }

@@ -11,7 +11,7 @@ public class Selection : MonoBehaviour {
 	//	GameObject[] ChessPieces = Object.FindObjectsOfType(ChessPiece);
 		//foreach(GameObject Piece in ChessPieces) {
 		//	Piece.particleEmitter.enabled = false;
-		gameObject.particleSystem.enableEmission = false;
+		//gameObject.particleSystem.enableEmission = false;
 		}
 	// Update is called once per frame
 	void Update () {

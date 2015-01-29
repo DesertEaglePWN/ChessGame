@@ -11,86 +11,121 @@ public enum TeamColor {None, Black, White};
 
 public abstract class ChessPiece : MonoBehaviour
 {
+    /// <summary>
+    /// The piece's team color.
+    /// (Defaults to 'None')
+    /// </summary>
+    public TeamColor PieceColor { get; private set; }
 
     /// <summary>
-    /// The Game Manager.
+    /// True if the piece has been moved this game.
     /// </summary>
-    public GameManager gameManager;
-
-    /// <summary>
-    /// The Material Library.
-    /// </summary>
-    public MaterialLibrary materialLibrary;
-
-    /// <summary>
-    /// The piece's team color.  SET PRIVATE WHEN DONE.
-    /// (Defaults to "None")
-    /// </summary>
-    public TeamColor teamColor = TeamColor.None;
-
-    /// <summary>
-    /// The position of the piece.
-    /// </summary>
-    protected Vector3 Position;
-
     public bool bHasMoved = false;
 
     /// <summary>
-    /// The current space that the piece resides on. SET PRIVATE WHEN DONE.
+    /// Bool that tells whether or not this piece is putting an opposing king in check
+    /// </summary>
+    public bool isChecking {get; set;}
+
+    /// <summary>
+    /// The current space that the piece resides on.
     /// </summary>
     public BoardSpace currentSpace;
 
-    private BoardSpace[] availableSpaces;
+    ///// <summary>
+    ///// Holds the available spaces the piece can move to.
+    ///// </summary>
+    //private BoardSpace[] availableSpaces;
 
     // Use this for initialization
     void Start()
     {
-        //On Start, check and update piece color and position
-        if (teamColor == TeamColor.Black)
-        {
-            gameObject.renderer.material = materialLibrary.materialBlack;
-        }
-        else if (teamColor == TeamColor.White)
-        {
-            gameObject.renderer.material = materialLibrary.materialWhite;
-        }
-        Position.x = currentSpace.transform.position.x;
-        Position.z = currentSpace.transform.position.z;
-        Position.y = gameObject.transform.position.y;
-        gameObject.transform.position = Position;
+        InitPieceColor();
+        this.transform.position = new Vector3(currentSpace.transform.position.x,this.transform.position.y,currentSpace.transform.position.z); //set position to match the currentSpace
+        isChecking = false;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-
-    }
 
     void OnMouseEnter()
     {
-        gameManager.PieceHover(this);
+        if (!GameManager.currentInstance.isGamePaused)
+        {
+            if (PieceColor == GameManager.currentInstance.turnTeamColor) {
+               GameManager.currentInstance.enablePieceHalo(this, true);
+            }
+        }
     }
 
     void OnMouseExit()
     {
-        gameManager.PieceHover(this);
+            GameManager.currentInstance.enablePieceHalo(this, false);
     }
 
     void OnMouseDown()
     {
-        gameManager.SelectPiece(this);
+        if (!GameManager.currentInstance.isGamePaused) { 
+            if (GameManager.currentInstance.turnTeamColor == PieceColor)
+            {
+                if ((GameManager.currentInstance.activePiece == this))
+                {
+                    GameManager.currentInstance.DeselectPiece(this);
+                }
+                else 
+                {
+                    GameManager.currentInstance.SelectPiece(this);
+                }
+            
+            }
+        }
     }
 
+    /// <summary>
+    /// Finds and returns an array of BoardSpace objects that correspond to all spaces available for the piece to move to.
+    /// (Unique to each piece type)
+    /// </summary>
+    /// <returns>BoarSpace[]</returns>
     public abstract BoardSpace[] GetAvailableSpaces();
 
-    public void Move(BoardSpace targetSpace)
+    /// <summary>
+    /// Checks and initializes piece color. Applies appropriate starting materials.
+    /// </summary>
+    private void InitPieceColor()
+        {
+            //On Start, check and update piece color and position
+            if ((currentSpace.spaceRow == '1') || (currentSpace.spaceRow == '2'))
+            {
+                PieceColor = TeamColor.White;
+                this.renderer.material = GameManager.currentInstance.materialLibrary.materialWhite;
+            }
+            else if ((currentSpace.spaceRow == '7') || (currentSpace.spaceRow == '8'))
+            {
+                PieceColor = TeamColor.Black;
+                this.renderer.material = GameManager.currentInstance.materialLibrary.materialBlack;
+            }
+            else
+            {
+                PieceColor = TeamColor.None;
+            }
+            return;
+        }
+
+    protected List<BoardSpace> GetAvailableInDirection(SpaceDirection direction)
     {
-        Position.x = targetSpace.transform.position.x;
-        Position.z = targetSpace.transform.position.z;
-        gameObject.transform.position = Position;
-        currentSpace = targetSpace;
-        bHasMoved = true;
-        gameManager.ChangeTurn();
+        List<BoardSpace> availableSpaces = new List<BoardSpace>();
+
+        BoardSpace nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, direction, PieceColor, true);
+
+        while (GameManager.currentInstance.Board.checkSpace(nextSpace) != null)
+        {
+            availableSpaces.Add(nextSpace);
+            if (nextSpace.spaceState == SpaceState.Contested)
+            {
+                break;
+            }
+            nextSpace = GameManager.currentInstance.Board.getAdjacentSpace(nextSpace, direction, PieceColor, true);
+        }
+
+        return availableSpaces;
     }
+
 }

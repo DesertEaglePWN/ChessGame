@@ -28,28 +28,65 @@ public enum GameState {Wait, Select, Action};
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager currentInstance;
+    public MaterialLibrary materialLibrary;
+    public GameObject PauseMenu;
+    public bool isGamePaused;
     private GameMode currentGameMode = GameMode.Classic;
     private GameState currentGameState = GameState.Select;
-    public ChessPiece activePiece;
+
+  //  public bool EnPassantPossible { get; set; }
+    public ChessPiece activePiece = null;
     public TeamColor turnTeamColor = TeamColor.Black;
     public Board Board {get; private set;}
-  
+    BoardSpace[] availableSpaces;
+    ChessPiece[] chessPieces;
+    King WhiteKing;
+    King BlackKing;
+
     void Awake()
     {
-
+        currentInstance = this;
+        materialLibrary = this.gameObject.GetComponent<MaterialLibrary>();
     }
 
     void Start()
     {
         Board = new Board(GameObject.FindObjectsOfType<BoardSpace>()); //Create the Board
+        chessPieces = GameObject.FindObjectsOfType<ChessPiece>();     //Store all ChessPieces for later
+        foreach (King king in (GameObject.FindObjectsOfType<King>()))
+        {
+            switch (king.PieceColor)
+            {
+                case TeamColor.White:
+                    WhiteKing = king;
+                    break;
+                case TeamColor.Black:
+                    BlackKing = king;
+                    break;
+                case TeamColor.None:
+                    break;
+
+            }
+        }
+        isGamePaused = false;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
+    public void Update() {
+        if (Input.GetKeyDown(KeyCode.Escape)) 
+        {
+            if (!isGamePaused) 
+            {
+                PauseGame();
+            }
+            else 
+            {
+                ResumeGame();
+            }
+            
+        }
+        
     }
-
     public void AdvanceGameState() 
     {
         switch (currentGameState) 
@@ -59,11 +96,17 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.Select:
                 currentGameState = GameState.Action;
-                (activePiece.GetComponent("Halo") as Behaviour).enabled = true;
+                InactiveColliderEnable(false);
                 break;
             case GameState.Action:
+                foreach (BoardSpace space in Board.spaces) 
+               {
+                   space.spaceState = SpaceState.Default;
+                }
                 currentGameState = GameState.Select;
-                Board.clearAvailableSpaces();
+                InactiveColliderEnable(true);
+                HideSpaces(availableSpaces);
+                activePiece = null;
                 break;
         
         }
@@ -73,76 +116,274 @@ public class GameManager : MonoBehaviour
         switch (turnTeamColor){
             case (TeamColor.Black):
                 turnTeamColor = TeamColor.White;
+                Debug.Log("White Checked:");
+                WhiteKing.isChecked = isKingChecked(TeamColor.White);
+                Debug.Log(isKingChecked(TeamColor.White));
+                Debug.Log(WhiteKing.GetAvailableSpaces().Length == 0);
+                Debug.Log("White King Available Spaces-----");
+                foreach (BoardSpace space in WhiteKing.GetAvailableSpaces())
+                {
+                    Debug.Log(space);
+                }
+                Debug.Log("---------------------");
+
+                if ((isKingChecked(TeamColor.White)) && (BlackKing.GetAvailableSpaces().Length == 0)) 
+                {
+                    Win(TeamColor.Black);
+                }
                 break;
             case (TeamColor.White):
                 turnTeamColor = TeamColor.Black;
+                Debug.Log("Black Checked:");
+                BlackKing.isChecked = isKingChecked(TeamColor.Black);
+                Debug.Log(isKingChecked(TeamColor.Black));
+                Debug.Log(BlackKing.GetAvailableSpaces().Length);
+                Debug.Log("Black King Available Spaces-----");
+                foreach (BoardSpace space in BlackKing.GetAvailableSpaces())
+                {
+                    Debug.Log(space);
+                }
+                Debug.Log("---------------------");
+                if ((isKingChecked(TeamColor.Black)) && (BlackKing.GetAvailableSpaces().Length == 0)) 
+                {
+                    Win(TeamColor.White);
+                }
                 break;
+        }
+        
+    }
+
+    public void Win(TeamColor Winner) {
+        switch(Winner){
+            case TeamColor.Black:
+                Debug.Log("Black Wins!");
+                break;
+            case TeamColor.White:
+                Debug.Log("White Wins!");
+                break;
+            default:
+                break;
+        }
+        
+    }
+
+    public bool isKingChecked(TeamColor kingColor) 
+    {
+        switch (kingColor) 
+        {
+            case TeamColor.White:
+                return Board.isSpaceChecked(WhiteKing.currentSpace, TeamColor.White);
+            case TeamColor.Black:
+                return Board.isSpaceChecked(BlackKing.currentSpace, TeamColor.Black);
+            case TeamColor.None:
+                break;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Toggles a piece's "Halo" effect
+    /// </summary>
+    /// <param name="piece"></param>
+    public void enablePieceHalo(ChessPiece piece, bool enabled) 
+    {
+        Behaviour halo = piece.GetComponent("Halo") as Behaviour;
+        if (enabled)
+        { 
+            halo.enabled = true;
+        }
+        else 
+        {
+            halo.enabled = false;
         }
     }
 
-    public void PieceHover(ChessPiece piece) 
+    public void PauseGame() {
+        isGamePaused = true;
+        foreach (ChessPiece piece in chessPieces)
+        {
+            enablePieceHalo(piece, false);
+        }
+        PauseMenu.SetActive(isGamePaused);
+    }
+
+    public void ResumeGame()
     {
-        Behaviour halo = piece.GetComponent("Halo") as Behaviour;
-        halo.enabled = !halo.enabled;
-       
+        isGamePaused = false;
+        PauseMenu.SetActive(isGamePaused);
     }
 
     public void SelectPiece(ChessPiece piece)
     {
-        Debug.Log(currentGameState);
-        
-        if (activePiece == piece)
-        {
-            Debug.Log("stuff");
-            DeselectPiece(piece);
-        }
-        else
-        {
-            BoardSpace[] availableSpaces = piece.GetAvailableSpaces();
-            DisplaySpaces(availableSpaces);
-            activePiece = piece;
-            Debug.Log(activePiece);
-            AdvanceGameState();
-        }
+
+        activePiece = piece;
+        availableSpaces = piece.GetAvailableSpaces();
+
+        //Debug.Log("Available Spaces-----");
+        //foreach (BoardSpace space in availableSpaces) {
+        //    Debug.Log(space);
+        //}
+        //Debug.Log("---------------------");
+
+        DisplaySpaces(availableSpaces);
+        AdvanceGameState();
         return;
     }
 
     public void DeselectPiece(ChessPiece piece)
     {
-        BoardSpace[] availableSpaces = piece.GetAvailableSpaces();
-        HideSpaces(availableSpaces);
-        AdvanceGameState();
-        HideSpaces(availableSpaces);
+        if (turnTeamColor == piece.PieceColor)
+        {
+            BoardSpace[] availableSpaces = piece.GetAvailableSpaces();
+            HideSpaces(availableSpaces);
+            AdvanceGameState();
+            HideSpaces(availableSpaces);
+            activePiece = null;
+        }
     }
 
+    /// <summary>
+    /// Moves the GameManager's activePiece to the destination BoardSpace.
+    /// </summary>
+    /// <param name="destination"></param>
+    public void MovePiece(BoardSpace destination) 
+    {
+        MovePiece(activePiece, destination);
+    }
+    /// <summary>
+    /// Moves a passed in ChessPiece to the destination BoardSpace
+    /// </summary>
+    /// <param name="pieceToMove"></param>
+    /// <param name="destination"></param>
+    public void MovePiece(ChessPiece piece, BoardSpace destination) 
+    {
+        if ((piece.GetType() == typeof(King)) && ((piece as King).CanCastle)) {
+            castleMove(piece, destination);
+        }
+        piece.transform.position = new Vector3(destination.transform.position.x,piece.transform.position.y, destination.transform.position.z);
+        piece.currentSpace.OccupyingPiece = null;   //clear old space's OccupyingPiece
+        piece.currentSpace = destination;
+        destination.OccupyingPiece = piece;
+        piece.bHasMoved = true;
+        ChangeTurn();
+    
+    }
 
-    public void DisplaySpaces(BoardSpace[] spacesToDisplay)
+    public void RemovePiece(ChessPiece piece) {
+        GameObject.Destroy(piece.gameObject);
+    }
+    private void DisplaySpaces(BoardSpace[] spacesToDisplay)
     {
         foreach (BoardSpace space in spacesToDisplay)
         {
             if (space != null)
             {
-                space.spaceState = SpaceState.Open;
                 Renderer meshRenderer = space.GetComponent<Renderer>();
+                Collider spaceCollider = space.GetComponent<Collider>();
+                switch (space.spaceState){
+                    case SpaceState.Contested:
+                        meshRenderer.material = materialLibrary.materialSpaceContested;
+                        break;
+                    case SpaceState.Open:
+                        meshRenderer.material = materialLibrary.materialSpaceOpen;
+                        break;
+                    case SpaceState.Blocked:
+                        meshRenderer.material = materialLibrary.materialSpaceOpen;
+                        break;
+                    default:
+                        meshRenderer.material = materialLibrary.materialSpaceOpen;
+                        break;
+                }
                 meshRenderer.enabled = true;
+                spaceCollider.enabled = true;
             }
         }
 
     }
 
-    public void HideSpaces(BoardSpace[] spacesToHide)
+    private void HideSpaces(BoardSpace[] spacesToHide)
     {
         foreach (BoardSpace space in spacesToHide)
         {
             if (space != null)
             {
-                space.spaceState = SpaceState.Default;
                 Renderer meshRenderer = space.GetComponent<Renderer>();
+                Collider spaceCollider = space.GetComponent<Collider>();
                 meshRenderer.enabled = false;
-                AdvanceGameState();
+                spaceCollider.enabled = false;
             }
         }
     }
+
+    /// <summary>
+    /// Enables/Disables colliders for all chess pieces besides the active piece. 
+    /// (True to Enable; False to Disable)
+    /// </summary>
+    /// <param name="Enable"></param>
+    private void InactiveColliderEnable(bool Enable) 
+    {
+        foreach (ChessPiece piece in chessPieces)
+        {
+            if ((piece != activePiece) && (piece != null))
+            {
+                if (Enable == true) 
+                {
+                    piece.collider.enabled = true;
+                }
+                else if (Enable == false)
+                {
+                    piece.collider.enabled = false;
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Checks whether or not a Castle Move occured and moves the appropriate Rook if so.
+    /// </summary>
+    /// <param name="king"></param>
+    /// <param name="destination"></param>
+    private void castleMove(ChessPiece king, BoardSpace destination) {
+        ChessPiece rook;
+        BoardSpace rookSpace;
+        Debug.Log("Running castleMove()");
+        switch (king.PieceColor)
+        {
+            case (TeamColor.Black):
+                if (destination.name == "C8")
+                {
+                    rook = GameObject.Find("A8").GetComponent<BoardSpace>().OccupyingPiece;
+                    rookSpace = GameObject.Find("D8").GetComponent<BoardSpace>();
+                    MovePiece(rook, rookSpace);
+                    turnTeamColor = king.PieceColor;
+                }
+                else if (destination.name == "G8")
+                {
+                    rook = GameObject.Find("H8").GetComponent<BoardSpace>().OccupyingPiece;
+                    rookSpace = GameObject.Find("F8").GetComponent<BoardSpace>();
+                    MovePiece(rook, rookSpace);
+                    turnTeamColor = king.PieceColor;
+                }
+                break;
+            case (TeamColor.White):
+                if (destination.name == "C1")
+                {
+                    rook = GameObject.Find("A1").GetComponent<BoardSpace>().OccupyingPiece;
+                    rookSpace = GameObject.Find("D1").GetComponent<BoardSpace>();
+                    MovePiece(rook, rookSpace);
+                    turnTeamColor = king.PieceColor;
+                }
+                else if (destination.name == "G1")
+                {
+                    rook = GameObject.Find("H1").GetComponent<BoardSpace>().OccupyingPiece;
+                    rookSpace = GameObject.Find("F1").GetComponent<BoardSpace>();
+                    MovePiece(rook, rookSpace);
+                    turnTeamColor = king.PieceColor;
+                }
+                break;
+        }
+    }
+
 }
 
 

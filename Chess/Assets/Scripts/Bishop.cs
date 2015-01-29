@@ -16,15 +16,16 @@ public class Bishop : ChessPiece{
 
     public override BoardSpace[] GetAvailableSpaces()
     {
-        //Debug.Log (activeSpace.getSpace(SpaceDirection.Front,teamColor));
-        List<BoardSpace> possibleSpaces = new List<BoardSpace>();
-        BoardSpace[] Diagonals = gameManager.Board.getDiagonals(currentSpace);
-        foreach (BoardSpace space in Diagonals) {
-            possibleSpaces.Add(space);
-        }
-        return possibleSpaces.ToArray();
-    }
+        List<BoardSpace> availableSpaces = new List<BoardSpace>();
 
+        //GET BASE MOVE AND CAPTURE SPACES
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.FrontLeft));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.FrontRight));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.BackLeft));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.BackRight));
+        
+        return availableSpaces.ToArray();
+    }
 }
 
 

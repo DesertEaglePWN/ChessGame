@@ -16,17 +16,12 @@ public class Rook : ChessPiece{
 
     public override BoardSpace[] GetAvailableSpaces()
     {
-        //Debug.Log (activeSpace.getSpace(SpaceDirection.Front,teamColor));
-        List<BoardSpace> possibleSpaces = new List<BoardSpace>();
-        BoardSpace[] currentColumn = gameManager.Board.getCurrentColumn(currentSpace);
-        BoardSpace[] currentRow = gameManager.Board.getCurrentRow(currentSpace);
-        foreach (BoardSpace space in currentColumn) {
-            possibleSpaces.Add(space);
-        }
-        foreach (BoardSpace space in currentRow) {
-            possibleSpaces.Add(space);
-        }
-        return possibleSpaces.ToArray();
+        List<BoardSpace> availableSpaces = new List<BoardSpace>();
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.Front));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.Right));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.Back));
+        availableSpaces.AddRange(GetAvailableInDirection(SpaceDirection.Left));
+        return availableSpaces.ToArray();
     }
 
 }

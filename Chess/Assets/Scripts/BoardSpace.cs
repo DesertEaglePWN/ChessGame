@@ -8,19 +8,20 @@ using UnityEngine;
 /// Enumeration of BoardSpace states
 /// (Default = 0, Active = 1, Contested = 2)
 /// </summary>
-public enum SpaceState {Default, Open, Contested};
+public enum SpaceState {Default, Open, Blocked, Contested};
 
 
 public class BoardSpace : MonoBehaviour {
-	public MaterialLibrary materialLibrary;
-	public GameManager gameManager;
-
 	public char spaceColumn;
 	public char spaceRow;
 	//public char spaceColor;
 	public SpaceState spaceState = SpaceState.Default;
 
+   [SerializeField]
+   private ChessPiece occupyingPiece;
+   public ChessPiece OccupyingPiece { get { return occupyingPiece; } set { occupyingPiece = value; } }
 
+    public bool bOccupied = false;
 
 	void Awake(){
 		//Initialize Board
@@ -30,18 +31,15 @@ public class BoardSpace : MonoBehaviour {
 		} else {
 				Debug.Log ("Non-BoardSpace object running BoardSpace.cs");
 		}
-		//Debug.Log (gameObject.name);
-		//Debug.Log (spaceColumn.ToString());
-		//Debug.Log (spaceRow.ToString());
 	}
 
 	void OnMouseEnter(){
 		switch (spaceState) {
 			case(SpaceState.Open):
-				gameObject.renderer.material = materialLibrary.materialSpaceOpenHover;
+				this.renderer.material = GameManager.currentInstance.materialLibrary.materialSpaceOpenHover;
 				break;
 			case(SpaceState.Contested):
-				gameObject.renderer.material = materialLibrary.materialSpaceContestedHover;
+                this.renderer.material = GameManager.currentInstance.materialLibrary.materialSpaceContestedHover;
 				break;
 		}
 		return;
@@ -50,10 +48,10 @@ public class BoardSpace : MonoBehaviour {
 	void OnMouseExit(){
 		switch (spaceState) {
 			case(SpaceState.Open):
-				gameObject.renderer.material = materialLibrary.materialSpaceOpen;
+                this.renderer.material = GameManager.currentInstance.materialLibrary.materialSpaceOpen;
 				break;
 			case(SpaceState.Contested):
-				gameObject.renderer.material = materialLibrary.materialSpaceContested;
+                this.renderer.material = GameManager.currentInstance.materialLibrary.materialSpaceContested;
 				break;
 		}
 		
@@ -61,13 +59,25 @@ public class BoardSpace : MonoBehaviour {
 	}
 
 	void OnMouseDown(){
-        if (((spaceState == SpaceState.Open) || (spaceState == SpaceState.Contested))){
-            gameManager.activePiece.Move(this);
-            gameManager.AdvanceGameState();
+        if (spaceState == SpaceState.Open)
+        {
+            GameManager.currentInstance.MovePiece(this);
+            GameManager.currentInstance.AdvanceGameState();
         }
-					
-		
-		return;
+        else if (spaceState == SpaceState.Contested)
+        {
+            if (this.OccupyingPiece != null) {  
+                GameManager.currentInstance.RemovePiece(this.OccupyingPiece);   //default capture case
+            }
+            else if (Pawn.EnPassantPossible) {
+                 BoardSpace enPassantSpace = GameManager.currentInstance.Board.getAdjacentSpace(this, SpaceDirection.Back, GameManager.currentInstance.activePiece.PieceColor,false);
+                 GameManager.currentInstance.RemovePiece(enPassantSpace.OccupyingPiece);
+            }
+            GameManager.currentInstance.MovePiece(this);
+            OccupyingPiece = GameManager.currentInstance.activePiece;
+            GameManager.currentInstance.AdvanceGameState();
+        }
+     
 	}
 
 //Use to test for overlaping colliders
