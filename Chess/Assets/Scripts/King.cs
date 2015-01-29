@@ -25,26 +25,47 @@ public class King : ChessPiece
         //GET BASE MOVE AND CAPTURE SPACES
         BoardSpace tempSpace, leftSpace, rightSpace;
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontLeft, PieceColor, true);
-        if (tempSpace != null)
+        if ((tempSpace != null) && (tempSpace.spaceState != SpaceState.Blocked) && (tempSpace.spaceState != SpaceState.Contested))
         {
             possibleSpaces.Add(tempSpace);
         }
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, PieceColor, true);
-        if (tempSpace != null) possibleSpaces.Add(tempSpace);
+        if ((tempSpace != null) && (tempSpace.spaceState != SpaceState.Blocked) && (tempSpace.spaceState != SpaceState.Contested))
+        {
+            possibleSpaces.Add(tempSpace);
+        }
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontRight, PieceColor, true);
-        if (tempSpace != null) possibleSpaces.Add(tempSpace);
+        if ((tempSpace != null) && (tempSpace.spaceState != SpaceState.Blocked) && (tempSpace.spaceState != SpaceState.Contested))
+        {
+            possibleSpaces.Add(tempSpace);
+        }
         leftSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Left, PieceColor, true);
-        if (leftSpace != null) possibleSpaces.Add(leftSpace);
+        if ((leftSpace != null) && (leftSpace.spaceState != SpaceState.Blocked) && (leftSpace.spaceState != SpaceState.Contested))
+        {
+            possibleSpaces.Add(leftSpace);
+        }
         //Debug.Log(currentSpace);
         rightSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Right, PieceColor, true);
         //Debug.Log(rightSpace);
-        if (rightSpace != null) possibleSpaces.Add(rightSpace);
+        if ((rightSpace != null) && (rightSpace.spaceState != SpaceState.Blocked) && (rightSpace.spaceState != SpaceState.Contested))
+        {
+            possibleSpaces.Add(rightSpace);
+        }
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.BackLeft, PieceColor, true);
-        if (tempSpace != null) possibleSpaces.Add(tempSpace);
+        if ((tempSpace != null) && (tempSpace.spaceState != SpaceState.Blocked) && (tempSpace.spaceState != SpaceState.Contested))
+        {
+            possibleSpaces.Add(tempSpace);
+        }
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Back, PieceColor, true);
-        if (tempSpace != null) possibleSpaces.Add(tempSpace);
+        if ((tempSpace != null) && (tempSpace.spaceState != SpaceState.Blocked) && (tempSpace.spaceState != SpaceState.Contested))
+        {
+            possibleSpaces.Add(tempSpace);
+        }
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.BackRight, PieceColor, true);
-        if (tempSpace != null) possibleSpaces.Add(tempSpace);
+        if ((tempSpace != null) && (tempSpace.spaceState != SpaceState.Blocked) && (tempSpace.spaceState != SpaceState.Contested))
+        {
+            possibleSpaces.Add(tempSpace);
+        }
 
         //REMOVE CHECKED SPACES
         BoardSpace[] checkedSpaces = getCheckedSpaces();
@@ -217,7 +238,11 @@ public class King : ChessPiece
                 checkedSpaces.Add(tempSpace);
             }
         }
-
+        foreach (BoardSpace space in checkedSpaces)
+        {
+            Debug.Log("CheckedSpaces");
+            Debug.Log(space);
+        }
         return checkedSpaces.ToArray();
     }
 

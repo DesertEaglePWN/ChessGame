@@ -19,6 +19,7 @@ public class Pawn : ChessPiece
 
     public override BoardSpace[] GetAvailableSpaces()
     {
+        Debug.Log("Getting Available Spaces");
         List<BoardSpace> possibleSpaces = new List<BoardSpace>();
 
         //Basic Movement
@@ -30,10 +31,6 @@ public class Pawn : ChessPiece
             {
                 possibleSpaces.Add(nextSpace);
             }
-            else
-            {
-                return possibleSpaces.ToArray();
-            }
         }
         if (!bHasMoved)
         {
@@ -44,10 +41,6 @@ public class Pawn : ChessPiece
                 if ((nextSpace.spaceState != SpaceState.Contested) && (nextSpace.spaceState != SpaceState.Blocked))
                 {
                     possibleSpaces.Add(nextSpace);
-                }
-                else
-                {
-                    return possibleSpaces.ToArray();
                 }
             }
         }
@@ -61,6 +54,7 @@ public class Pawn : ChessPiece
                 possibleSpaces.Add(captureSpace);
             }
         }
+
         captureSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontRight, PieceColor, true);
         if (GameManager.currentInstance.Board.checkSpace(captureSpace) != null)
         {
@@ -110,7 +104,7 @@ public class Pawn : ChessPiece
             }
         }
         //--------------------------------------------------------------
-        //Debug.Log(possibleSpaces.Count);
+        Debug.Log(possibleSpaces.Count);
         return possibleSpaces.ToArray();
     }
     

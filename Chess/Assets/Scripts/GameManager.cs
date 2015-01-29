@@ -116,7 +116,7 @@ public class GameManager : MonoBehaviour
         switch (turnTeamColor){
             case (TeamColor.Black):
                 turnTeamColor = TeamColor.White;
-                Debug.Log("White Checked:");
+                Debug.Log("White King Checked:");
                 WhiteKing.isChecked = isKingChecked(TeamColor.White);
                 Debug.Log(isKingChecked(TeamColor.White));
                 Debug.Log(WhiteKing.GetAvailableSpaces().Length == 0);
@@ -127,7 +127,7 @@ public class GameManager : MonoBehaviour
                 }
                 Debug.Log("---------------------");
 
-                if ((isKingChecked(TeamColor.White)) && (BlackKing.GetAvailableSpaces().Length == 0)) 
+                if ((isKingChecked(TeamColor.White)) && (WhiteKing.GetAvailableSpaces().Length == 0)) 
                 {
                     Win(TeamColor.Black);
                 }
@@ -215,7 +215,8 @@ public class GameManager : MonoBehaviour
 
     public void SelectPiece(ChessPiece piece)
     {
-
+        //Debug.Log("Piece Selected:");
+        //Debug.Log(piece);
         activePiece = piece;
         availableSpaces = piece.GetAvailableSpaces();
 
@@ -266,11 +267,10 @@ public class GameManager : MonoBehaviour
         destination.OccupyingPiece = piece;
         piece.bHasMoved = true;
         ChangeTurn();
-    
     }
 
     public void RemovePiece(ChessPiece piece) {
-        GameObject.Destroy(piece.gameObject);
+        piece.gameObject.SetActive(false);
     }
     private void DisplaySpaces(BoardSpace[] spacesToDisplay)
     {
