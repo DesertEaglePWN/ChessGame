@@ -30,6 +30,8 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager currentInstance;
     public MaterialLibrary materialLibrary;
+    public GameObject PauseMenu;
+    public bool isGamePaused;
     private GameMode currentGameMode = GameMode.Classic;
     private GameState currentGameState = GameState.Select;
 
@@ -39,6 +41,8 @@ public class GameManager : MonoBehaviour
     public Board Board {get; private set;}
     BoardSpace[] availableSpaces;
     ChessPiece[] chessPieces;
+    King WhiteKing;
+    King BlackKing;
 
     void Awake()
     {
@@ -49,9 +53,40 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         Board = new Board(GameObject.FindObjectsOfType<BoardSpace>()); //Create the Board
-        chessPieces = GameObject.FindObjectsOfType<ChessPiece>();    //Store all ChessPieces for later
+        chessPieces = GameObject.FindObjectsOfType<ChessPiece>();     //Store all ChessPieces for later
+        foreach (King king in (GameObject.FindObjectsOfType<King>()))
+        {
+            switch (king.PieceColor)
+            {
+                case TeamColor.White:
+                    WhiteKing = king;
+                    break;
+                case TeamColor.Black:
+                    BlackKing = king;
+                    break;
+                case TeamColor.None:
+                    break;
+
+            }
+        }
+        isGamePaused = false;
     }
 
+    public void Update() {
+        if (Input.GetKeyDown(KeyCode.Escape)) 
+        {
+            if (!isGamePaused) 
+            {
+                PauseGame();
+            }
+            else 
+            {
+                ResumeGame();
+            }
+            
+        }
+        
+    }
     public void AdvanceGameState() 
     {
         switch (currentGameState) 
@@ -81,41 +116,117 @@ public class GameManager : MonoBehaviour
         switch (turnTeamColor){
             case (TeamColor.Black):
                 turnTeamColor = TeamColor.White;
+                Debug.Log("White Checked:");
+                WhiteKing.isChecked = isKingChecked(TeamColor.White);
+                Debug.Log(isKingChecked(TeamColor.White));
+                Debug.Log(WhiteKing.GetAvailableSpaces().Length == 0);
+                Debug.Log("White King Available Spaces-----");
+                foreach (BoardSpace space in WhiteKing.GetAvailableSpaces())
+                {
+                    Debug.Log(space);
+                }
+                Debug.Log("---------------------");
+
+                if ((isKingChecked(TeamColor.White)) && (BlackKing.GetAvailableSpaces().Length == 0)) 
+                {
+                    Win(TeamColor.Black);
+                }
                 break;
             case (TeamColor.White):
                 turnTeamColor = TeamColor.Black;
+                Debug.Log("Black Checked:");
+                BlackKing.isChecked = isKingChecked(TeamColor.Black);
+                Debug.Log(isKingChecked(TeamColor.Black));
+                Debug.Log(BlackKing.GetAvailableSpaces().Length);
+                Debug.Log("Black King Available Spaces-----");
+                foreach (BoardSpace space in BlackKing.GetAvailableSpaces())
+                {
+                    Debug.Log(space);
+                }
+                Debug.Log("---------------------");
+                if ((isKingChecked(TeamColor.Black)) && (BlackKing.GetAvailableSpaces().Length == 0)) 
+                {
+                    Win(TeamColor.White);
+                }
                 break;
         }
         
+    }
+
+    public void Win(TeamColor Winner) {
+        switch(Winner){
+            case TeamColor.Black:
+                Debug.Log("Black Wins!");
+                break;
+            case TeamColor.White:
+                Debug.Log("White Wins!");
+                break;
+            default:
+                break;
+        }
+        
+    }
+
+    public bool isKingChecked(TeamColor kingColor) 
+    {
+        switch (kingColor) 
+        {
+            case TeamColor.White:
+                return Board.isSpaceChecked(WhiteKing.currentSpace, TeamColor.White);
+            case TeamColor.Black:
+                return Board.isSpaceChecked(BlackKing.currentSpace, TeamColor.Black);
+            case TeamColor.None:
+                break;
+        }
+        return false;
     }
 
     /// <summary>
     /// Toggles a piece's "Halo" effect
     /// </summary>
     /// <param name="piece"></param>
-    public void PieceHover(ChessPiece piece) 
+    public void enablePieceHalo(ChessPiece piece, bool enabled) 
     {
-        if ((turnTeamColor == piece.PieceColor))
-        {
-            Behaviour halo = piece.GetComponent("Halo") as Behaviour;
-            halo.enabled = !halo.enabled;
+        Behaviour halo = piece.GetComponent("Halo") as Behaviour;
+        if (enabled)
+        { 
+            halo.enabled = true;
         }
+        else 
+        {
+            halo.enabled = false;
+        }
+    }
+
+    public void PauseGame() {
+        isGamePaused = true;
+        foreach (ChessPiece piece in chessPieces)
+        {
+            enablePieceHalo(piece, false);
+        }
+        PauseMenu.SetActive(isGamePaused);
+    }
+
+    public void ResumeGame()
+    {
+        isGamePaused = false;
+        PauseMenu.SetActive(isGamePaused);
     }
 
     public void SelectPiece(ChessPiece piece)
     {
-                activePiece = piece;
-                availableSpaces = piece.GetAvailableSpaces();
 
-                //Debug.Log("Available Spaces-----");
-                //foreach (BoardSpace space in availableSpaces) {
-                //    Debug.Log(space);
-                //}
-                //Debug.Log("---------------------");
+        activePiece = piece;
+        availableSpaces = piece.GetAvailableSpaces();
 
-                DisplaySpaces(availableSpaces);
-                AdvanceGameState();
-               
+        //Debug.Log("Available Spaces-----");
+        //foreach (BoardSpace space in availableSpaces) {
+        //    Debug.Log(space);
+        //}
+        //Debug.Log("---------------------");
+
+        DisplaySpaces(availableSpaces);
+        AdvanceGameState();
         return;
     }
 
@@ -161,7 +272,7 @@ public class GameManager : MonoBehaviour
     public void RemovePiece(ChessPiece piece) {
         GameObject.Destroy(piece.gameObject);
     }
-    public void DisplaySpaces(BoardSpace[] spacesToDisplay)
+    private void DisplaySpaces(BoardSpace[] spacesToDisplay)
     {
         foreach (BoardSpace space in spacesToDisplay)
         {
@@ -190,7 +301,7 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void HideSpaces(BoardSpace[] spacesToHide)
+    private void HideSpaces(BoardSpace[] spacesToHide)
     {
         foreach (BoardSpace space in spacesToHide)
         {
@@ -209,7 +320,7 @@ public class GameManager : MonoBehaviour
     /// (True to Enable; False to Disable)
     /// </summary>
     /// <param name="Enable"></param>
-    public void InactiveColliderEnable(bool Enable) 
+    private void InactiveColliderEnable(bool Enable) 
     {
         foreach (ChessPiece piece in chessPieces)
         {
@@ -272,6 +383,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
+
 }
 
 

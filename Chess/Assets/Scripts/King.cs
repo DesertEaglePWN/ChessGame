@@ -25,7 +25,10 @@ public class King : ChessPiece
         //GET BASE MOVE AND CAPTURE SPACES
         BoardSpace tempSpace, leftSpace, rightSpace;
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontLeft, PieceColor, true);
-        if (tempSpace != null) possibleSpaces.Add(tempSpace);
+        if (tempSpace != null)
+        {
+            possibleSpaces.Add(tempSpace);
+        }
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, PieceColor, true);
         if (tempSpace != null) possibleSpaces.Add(tempSpace);
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontRight, PieceColor, true);
@@ -45,7 +48,6 @@ public class King : ChessPiece
 
         //REMOVE CHECKED SPACES
         BoardSpace[] checkedSpaces = getCheckedSpaces();
-        //int tempIndex = -1; //default "index" for space not in the checkedSpaces array
         foreach (BoardSpace checkedSpace in checkedSpaces)
         {
             possibleSpaces.Remove(checkedSpace);
@@ -140,9 +142,9 @@ public class King : ChessPiece
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontLeft, PieceColor, false);
         if (tempSpace != null)
         {
-            if (isSpaceChecked(tempSpace))
+            if (GameManager.currentInstance.Board.isSpaceChecked(tempSpace, PieceColor))
             {
-                tempSpace.spaceState = SpaceState.Blocked;
+                //tempSpace.spaceState = SpaceState.Blocked;
                 checkedSpaces.Add(tempSpace);
             }
         }
@@ -150,7 +152,7 @@ public class King : ChessPiece
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Front, PieceColor, false);
         if (tempSpace != null)
         {
-            if (isSpaceChecked(tempSpace))
+            if (GameManager.currentInstance.Board.isSpaceChecked(tempSpace, PieceColor))
             {
                 checkedSpaces.Add(tempSpace);
             }
@@ -160,7 +162,7 @@ public class King : ChessPiece
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.FrontRight, PieceColor, false);
         if (tempSpace != null)
         {
-            if (isSpaceChecked(tempSpace))
+            if (GameManager.currentInstance.Board.isSpaceChecked(tempSpace, PieceColor))
             {
                 checkedSpaces.Add(tempSpace);
             }
@@ -170,7 +172,7 @@ public class King : ChessPiece
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Left, PieceColor, false);
         if (tempSpace != null)
         {
-            if (isSpaceChecked(tempSpace))
+            if (GameManager.currentInstance.Board.isSpaceChecked(tempSpace, PieceColor))
             {
                 checkedSpaces.Add(tempSpace);
             }
@@ -180,7 +182,7 @@ public class King : ChessPiece
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Right, PieceColor, false);
         if (tempSpace != null)
         {
-            if (isSpaceChecked(tempSpace))
+            if (GameManager.currentInstance.Board.isSpaceChecked(tempSpace, PieceColor))
             {
                 checkedSpaces.Add(tempSpace);
             }
@@ -190,7 +192,7 @@ public class King : ChessPiece
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.BackLeft, PieceColor, false);
         if (tempSpace != null)
         {
-            if (isSpaceChecked(tempSpace))
+            if (GameManager.currentInstance.Board.isSpaceChecked(tempSpace, PieceColor))
             {
                 checkedSpaces.Add(tempSpace);
             }
@@ -200,7 +202,7 @@ public class King : ChessPiece
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.Back, PieceColor, false);
         if (tempSpace != null)
         {
-            if (isSpaceChecked(tempSpace))
+            if (GameManager.currentInstance.Board.isSpaceChecked(tempSpace, PieceColor))
             {
                 checkedSpaces.Add(tempSpace);
             }
@@ -210,7 +212,7 @@ public class King : ChessPiece
         tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(currentSpace, SpaceDirection.BackRight, PieceColor, false);
         if (tempSpace != null)
         {
-            if (isSpaceChecked(tempSpace))
+            if (GameManager.currentInstance.Board.isSpaceChecked(tempSpace, PieceColor))
             {
                 checkedSpaces.Add(tempSpace);
             }
@@ -219,193 +221,193 @@ public class King : ChessPiece
         return checkedSpaces.ToArray();
     }
 
-    private bool isSpaceChecked(BoardSpace space)
-    {
+    //public bool isSpaceChecked(BoardSpace space)
+    //{
 
-        // Logical OR of possible checked conditions
-        bool Checked = ((checkedFromDirection(space, SpaceDirection.FrontLeft)) || (checkedFromDirection(space, SpaceDirection.Front)) || (checkedFromDirection(space, SpaceDirection.FrontRight))
-            || (checkedFromDirection(space, SpaceDirection.Left)) || (checkedFromDirection(space, SpaceDirection.Right)) || (checkedFromDirection(space, SpaceDirection.BackLeft))
-            || (checkedFromDirection(space, SpaceDirection.Back)) || (checkedFromDirection(space, SpaceDirection.BackRight)) || checkedByKnight(space));
-        //Debug.Log(space);
-        return Checked;
+    //    // Logical OR of possible checked conditions
+    //    bool Checked = ((checkedFromDirection(space, SpaceDirection.FrontLeft)) || (checkedFromDirection(space, SpaceDirection.Front)) || (checkedFromDirection(space, SpaceDirection.FrontRight))
+    //        || (checkedFromDirection(space, SpaceDirection.Left)) || (checkedFromDirection(space, SpaceDirection.Right)) || (checkedFromDirection(space, SpaceDirection.BackLeft))
+    //        || (checkedFromDirection(space, SpaceDirection.Back)) || (checkedFromDirection(space, SpaceDirection.BackRight)) || checkedByKnight(space));
+    //    //Debug.Log(space);
+    //    return Checked;
 
-    }
-    private bool checkedByKnight(BoardSpace space) 
-    {
-        BoardSpace tempSpace, sideSpace;
-        //CHECK FRONT LEFT / FRONT RIGHT
-        tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(space, SpaceDirection.Front, PieceColor, false);
-        tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Front, PieceColor, false);
-        sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Left, PieceColor, false);
-        if ((sideSpace != null) && (sideSpace.OccupyingPiece != null))
-        { 
-            if ((sideSpace.OccupyingPiece.PieceColor != PieceColor) && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
-            {
-                Debug.Log("Space Checked by Knight");
-                return true;
-            }
-            sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Right, PieceColor, false);
-            if ((sideSpace != null) && (sideSpace.OccupyingPiece != null) && (sideSpace.OccupyingPiece.PieceColor != PieceColor) 
-                && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
-            {
-                Debug.Log("Space Checked by Knight");
-                return true;
-            }
-        }
+    //}
+    //private bool checkedByKnight(BoardSpace space) 
+    //{
+    //    BoardSpace tempSpace, sideSpace;
+    //    //CHECK FRONT LEFT / FRONT RIGHT
+    //    tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(space, SpaceDirection.Front, PieceColor, false);
+    //    tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Front, PieceColor, false);
+    //    sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Left, PieceColor, false);
+    //    if ((sideSpace != null) && (sideSpace.OccupyingPiece != null))
+    //    { 
+    //        if ((sideSpace.OccupyingPiece.PieceColor != PieceColor) && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
+    //        {
+    //            //Debug.Log("Space Checked by Knight");
+    //            return true;
+    //        }
+    //        sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Right, PieceColor, false);
+    //        if ((sideSpace != null) && (sideSpace.OccupyingPiece != null) && (sideSpace.OccupyingPiece.PieceColor != PieceColor) 
+    //            && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
+    //        {
+    //            //Debug.Log("Space Checked by Knight");
+    //            return true;
+    //        }
+    //    }
 
-        //CHECK LEFT FRONT / LEFT BACK
-        tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(space, SpaceDirection.Left, PieceColor, false);
-        tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Left, PieceColor, false);
-        sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Front, PieceColor, false);
-        if ((sideSpace != null) && (sideSpace.OccupyingPiece != null))  
-        {
-            if ((sideSpace.OccupyingPiece.PieceColor != PieceColor) && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
-            {
-                Debug.Log("Space Checked by Knight");
-                return true;
-            }
-            sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Back, PieceColor, false);
-            if ((sideSpace != null) && (sideSpace.OccupyingPiece != null) && (sideSpace.OccupyingPiece.PieceColor != PieceColor)
-                && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
-            {
-                Debug.Log("Space Checked by Knight");
-                return true;
-            }
-        }
+    //    //CHECK LEFT FRONT / LEFT BACK
+    //    tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(space, SpaceDirection.Left, PieceColor, false);
+    //    tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Left, PieceColor, false);
+    //    sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Front, PieceColor, false);
+    //    if ((sideSpace != null) && (sideSpace.OccupyingPiece != null))  
+    //    {
+    //        if ((sideSpace.OccupyingPiece.PieceColor != PieceColor) && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
+    //        {
+    //            //Debug.Log("Space Checked by Knight");
+    //            return true;
+    //        }
+    //        sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Back, PieceColor, false);
+    //        if ((sideSpace != null) && (sideSpace.OccupyingPiece != null) && (sideSpace.OccupyingPiece.PieceColor != PieceColor)
+    //            && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
+    //        {
+    //            //Debug.Log("Space Checked by Knight");
+    //            return true;
+    //        }
+    //    }
 
-        //CHECK RIGHT FRONT / RIGHT BACK
-        tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(space, SpaceDirection.Right, PieceColor, false);
-        tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Right, PieceColor, false);
-        sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Front, PieceColor, false);
-        if ((sideSpace != null) && (sideSpace.OccupyingPiece != null))
-        {
-            if ((sideSpace.OccupyingPiece.PieceColor != PieceColor) && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
-            {
-                Debug.Log("Space Checked by Knight");
-                return true;
-            }
-            sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Back, PieceColor, false);
-            if ((sideSpace != null) && (sideSpace.OccupyingPiece != null) && (sideSpace.OccupyingPiece.PieceColor != PieceColor)
-                && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
-            {
-                Debug.Log("Space Checked by Knight");
-                return true;
-            }
-        }
+    //    //CHECK RIGHT FRONT / RIGHT BACK
+    //    tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(space, SpaceDirection.Right, PieceColor, false);
+    //    tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Right, PieceColor, false);
+    //    sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Front, PieceColor, false);
+    //    if ((sideSpace != null) && (sideSpace.OccupyingPiece != null))
+    //    {
+    //        if ((sideSpace.OccupyingPiece.PieceColor != PieceColor) && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
+    //        {
+    //            //Debug.Log("Space Checked by Knight");
+    //            return true;
+    //        }
+    //        sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Back, PieceColor, false);
+    //        if ((sideSpace != null) && (sideSpace.OccupyingPiece != null) && (sideSpace.OccupyingPiece.PieceColor != PieceColor)
+    //            && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
+    //        {
+    //            //Debug.Log("Space Checked by Knight");
+    //            return true;
+    //        }
+    //    }
 
-        //CHECK BACK LEFT / BACK RIGHT
-        tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(space, SpaceDirection.Back, PieceColor, false);
-        tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Back, PieceColor, false);
-        sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Left, PieceColor, false);
-        if ((sideSpace != null) && (sideSpace.OccupyingPiece != null))
-        {
-            if ((sideSpace.OccupyingPiece.PieceColor != PieceColor) && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
-            {
-                Debug.Log("Space Checked by Knight");
-                return true;
-            }
-            sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Right, PieceColor, false);
-            if ((sideSpace != null) && (sideSpace.OccupyingPiece != null) && (sideSpace.OccupyingPiece.PieceColor != PieceColor)
-                && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
-            {
-                Debug.Log("Space Checked by Knight");
-                return true;
-            }
-        }
+    //    //CHECK BACK LEFT / BACK RIGHT
+    //    tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(space, SpaceDirection.Back, PieceColor, false);
+    //    tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Back, PieceColor, false);
+    //    sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Left, PieceColor, false);
+    //    if ((sideSpace != null) && (sideSpace.OccupyingPiece != null))
+    //    {
+    //        if ((sideSpace.OccupyingPiece.PieceColor != PieceColor) && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
+    //        {
+    //            //Debug.Log("Space Checked by Knight");
+    //            return true;
+    //        }
+    //        sideSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, SpaceDirection.Right, PieceColor, false);
+    //        if ((sideSpace != null) && (sideSpace.OccupyingPiece != null) && (sideSpace.OccupyingPiece.PieceColor != PieceColor)
+    //            && (sideSpace.OccupyingPiece.GetType() == typeof(Knight)))
+    //        {
+    //            //Debug.Log("Space Checked by Knight");
+    //            return true;
+    //        }
+    //    }
         
-        return false;
-    }
-    /// <summary>
-    /// Takes a space and direction and returns true if the space is in check from a piece in the specified direction
-    /// </summary>
-    /// <param name="space"></param>
-    /// <param name="direction"></param>
-    private bool checkedFromDirection(BoardSpace space, SpaceDirection direction)    
-    {
-        BoardSpace tempSpace;
-        if ((direction == SpaceDirection.Front) || (direction == SpaceDirection.Back) || (direction == SpaceDirection.Left) || (direction == SpaceDirection.Right))
-        {
-            tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false);
-            while ((tempSpace != null) && ((tempSpace.OccupyingPiece == null) || (tempSpace.OccupyingPiece == this)))
-            {
-                tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, direction, PieceColor, false); //search for piece on forward column
-            }
-            if (tempSpace != null)  //piece found; not the end of Board
-            {
-                if ((tempSpace.OccupyingPiece != null) && (tempSpace.OccupyingPiece.PieceColor != PieceColor))  //piece is an enemy piece
-                {
-                    //if ((tempSpace == GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false)) && (tempSpace.OccupyingPiece.GetType() == typeof(King)))    //is enermy king on first adjacent space (putting that space in check)
-                    //{
-                    //    return true;
-                    //}
+    //    return false;
+    //}
+    ///// <summary>
+    ///// Takes a space and direction and returns true if the space is in check from a piece in the specified direction
+    ///// </summary>
+    ///// <param name="space"></param>
+    ///// <param name="direction"></param>
+    //private bool checkedFromDirection(BoardSpace space, SpaceDirection direction)    
+    //{
+    //    BoardSpace tempSpace;
+    //    if ((direction == SpaceDirection.Front) || (direction == SpaceDirection.Back) || (direction == SpaceDirection.Left) || (direction == SpaceDirection.Right))
+    //    {
+    //        tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false);
+    //        while ((tempSpace != null) && ((tempSpace.OccupyingPiece == null) || (tempSpace.OccupyingPiece == this)))
+    //        {
+    //            tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, direction, PieceColor, false); //search for piece on forward column
+    //        }
+    //        if (tempSpace != null)  //piece found; not the end of Board
+    //        {
+    //            if ((tempSpace.OccupyingPiece != null) && (tempSpace.OccupyingPiece.PieceColor != PieceColor))  //piece is an enemy piece
+    //            {
+    //                //if ((tempSpace == GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false)) && (tempSpace.OccupyingPiece.GetType() == typeof(King)))    //is enermy king on first adjacent space (putting that space in check)
+    //                //{
+    //                //    return true;
+    //                //}
 
-                    switch ((tempSpace.OccupyingPiece.GetType().ToString()))  //is the piece one that can capture along the column?
-                    {
-                        case ("Rook"):
-                            return true;
-                        case ("Queen"):
-                            return true;
-                        case ("King"):
-                            if (tempSpace == GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false))
-                            {
-                                return true;
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-        else if ((direction == SpaceDirection.FrontLeft) || (direction == SpaceDirection.FrontRight) || (direction == SpaceDirection.BackLeft) || (direction == SpaceDirection.BackRight)) 
-        {
-            tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false);
-            while ((tempSpace != null) &&(tempSpace.OccupyingPiece == null))
-            {
-                tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, direction, PieceColor, false); //search for piece on forward column
-            }
-            if (tempSpace != null)  //piece found; not the end of Board
-            {
-                if ((tempSpace.OccupyingPiece != null) && (tempSpace.OccupyingPiece.PieceColor != PieceColor))  //piece is an enemy piece
-                {
+    //                switch ((tempSpace.OccupyingPiece.GetType().ToString()))  //is the piece one that can capture along the column?
+    //                {
+    //                    case ("Rook"):
+    //                        return true;
+    //                    case ("Queen"):
+    //                        return true;
+    //                    case ("King"):
+    //                        if (tempSpace == GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false))
+    //                        {
+    //                            return true;
+    //                        }
+    //                        break;
+    //                    default:
+    //                        break;
+    //                }
+    //            }
+    //        }
+    //    }
+    //    else if ((direction == SpaceDirection.FrontLeft) || (direction == SpaceDirection.FrontRight) || (direction == SpaceDirection.BackLeft) || (direction == SpaceDirection.BackRight)) 
+    //    {
+    //        tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false);
+    //        while ((tempSpace != null) &&(tempSpace.OccupyingPiece == null))
+    //        {
+    //            tempSpace = GameManager.currentInstance.Board.getAdjacentSpace(tempSpace, direction, PieceColor, false); //search for piece on forward column
+    //        }
+    //        if (tempSpace != null)  //piece found; not the end of Board
+    //        {
+    //            if ((tempSpace.OccupyingPiece != null) && (tempSpace.OccupyingPiece.PieceColor != PieceColor))  //piece is an enemy piece
+    //            {
 
-                    //if ((tempSpace == GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false)) && (tempSpace.OccupyingPiece.GetType() == typeof(King)))    //is enermy king on first adjacent space (putting that space in check)
-                    //{
-                    //    return true;
-                    //}
-                    //if ((direction == SpaceDirection.FrontLeft) || (direction == SpaceDirection.FrontRight))
-                    //{
-                    //    if ((tempSpace == GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false)) && (tempSpace.OccupyingPiece.GetType() == typeof(Pawn)))    //is enermy pawn on first diagonal space (putting that space in check)
-                    //    {
-                    //        return true;
-                    //    }
-                    //}
+    //                //if ((tempSpace == GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false)) && (tempSpace.OccupyingPiece.GetType() == typeof(King)))    //is enermy king on first adjacent space (putting that space in check)
+    //                //{
+    //                //    return true;
+    //                //}
+    //                //if ((direction == SpaceDirection.FrontLeft) || (direction == SpaceDirection.FrontRight))
+    //                //{
+    //                //    if ((tempSpace == GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false)) && (tempSpace.OccupyingPiece.GetType() == typeof(Pawn)))    //is enermy pawn on first diagonal space (putting that space in check)
+    //                //    {
+    //                //        return true;
+    //                //    }
+    //                //}
 
-                    switch ((tempSpace.OccupyingPiece.GetType().ToString()))  //is the piece one that can capture along the diagonal?
-                    {
-                        case ("Bishop"):
-                            return true;
-                        case ("Queen"):
-                            return true;
-                        case ("King"):
-                            if (tempSpace == GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false))
-                            {
-                                return true;
-                            }
-                            break;
-                        case ("Pawn"):
-                            if (tempSpace == GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false))
-                            {
-                                return true;
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-        return false;
+    //                switch ((tempSpace.OccupyingPiece.GetType().ToString()))  //is the piece one that can capture along the diagonal?
+    //                {
+    //                    case ("Bishop"):
+    //                        return true;
+    //                    case ("Queen"):
+    //                        return true;
+    //                    case ("King"):
+    //                        if (tempSpace == GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false))
+    //                        {
+    //                            return true;
+    //                        }
+    //                        break;
+    //                    case ("Pawn"):
+    //                        if (tempSpace == GameManager.currentInstance.Board.getAdjacentSpace(space, direction, PieceColor, false))
+    //                        {
+    //                            return true;
+    //                        }
+    //                        break;
+    //                    default:
+    //                        break;
+    //                }
+    //            }
+    //        }
+    //    }
+    //    return false;
     
-    }
+    //}
 }

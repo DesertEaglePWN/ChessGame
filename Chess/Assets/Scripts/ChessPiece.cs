@@ -23,6 +23,11 @@ public abstract class ChessPiece : MonoBehaviour
     public bool bHasMoved = false;
 
     /// <summary>
+    /// Bool that tells whether or not this piece is putting an opposing king in check
+    /// </summary>
+    public bool isChecking {get; set;}
+
+    /// <summary>
     /// The current space that the piece resides on.
     /// </summary>
     public BoardSpace currentSpace;
@@ -37,38 +42,40 @@ public abstract class ChessPiece : MonoBehaviour
     {
         InitPieceColor();
         this.transform.position = new Vector3(currentSpace.transform.position.x,this.transform.position.y,currentSpace.transform.position.z); //set position to match the currentSpace
+        isChecking = false;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-
-    }
 
     void OnMouseEnter()
     {
-        GameManager.currentInstance.PieceHover(this);
+        if (!GameManager.currentInstance.isGamePaused)
+        {
+            if (PieceColor == GameManager.currentInstance.turnTeamColor) {
+               GameManager.currentInstance.enablePieceHalo(this, true);
+            }
+        }
     }
 
     void OnMouseExit()
     {
-        GameManager.currentInstance.PieceHover(this);
+            GameManager.currentInstance.enablePieceHalo(this, false);
     }
 
     void OnMouseDown()
     {
-        if (GameManager.currentInstance.turnTeamColor == PieceColor)
-        {
-            if ((GameManager.currentInstance.activePiece == this))
+        if (!GameManager.currentInstance.isGamePaused) { 
+            if (GameManager.currentInstance.turnTeamColor == PieceColor)
             {
-                GameManager.currentInstance.DeselectPiece(this);
-            }
-            else 
-            {
-                GameManager.currentInstance.SelectPiece(this);
-            }
+                if ((GameManager.currentInstance.activePiece == this))
+                {
+                    GameManager.currentInstance.DeselectPiece(this);
+                }
+                else 
+                {
+                    GameManager.currentInstance.SelectPiece(this);
+                }
             
+            }
         }
     }
 

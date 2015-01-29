@@ -9,3 +9,15 @@ C:\Users\Austin\Documents\Chess\Temp\bin\Debug\ICSharpCode.NRefactory.dll
 C:\Users\Austin\Documents\Chess\obj\Debug\Assembly-CSharp.dll
 C:\Users\Austin\Documents\Chess\obj\Debug\Assembly-CSharp.pdb
 C:\Users\Austin\Documents\Chess\obj\Debug\Assembly-CSharp-vs.csprojResolveAssemblyReference.cache
+C:\Users\Austin\Documents\Chess\Temp\bin\Debug\UnityEngine.UI.dll
+C:\Users\Austin\Documents\Unity Projects\Chess\Temp\bin\Debug\Assembly-CSharp.dll
+C:\Users\Austin\Documents\Unity Projects\Chess\Temp\bin\Debug\Assembly-CSharp.pdb
+C:\Users\Austin\Documents\Unity Projects\Chess\Temp\bin\Debug\UnityEditor.dll
+C:\Users\Austin\Documents\Unity Projects\Chess\Temp\bin\Debug\UnityEngine.dll
+C:\Users\Austin\Documents\Unity Projects\Chess\Temp\bin\Debug\UnityEngine.UI.dll
+C:\Users\Austin\Documents\Unity Projects\Chess\Temp\bin\Debug\Mono.Cecil.dll
+C:\Users\Austin\Documents\Unity Projects\Chess\Temp\bin\Debug\nunit.framework.dll
+C:\Users\Austin\Documents\Unity Projects\Chess\Temp\bin\Debug\Unity.DataContract.dll
+C:\Users\Austin\Documents\Unity Projects\Chess\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+C:\Users\Austin\Documents\Unity Projects\Chess\obj\Debug\Assembly-CSharp.dll
+C:\Users\Austin\Documents\Unity Projects\Chess\obj\Debug\Assembly-CSharp.pdb
